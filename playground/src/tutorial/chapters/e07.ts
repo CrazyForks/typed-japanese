@@ -28,10 +28,11 @@ const chapter: Chapter = {
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type コーヒー = ProperNoun<"コーヒー">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
 
 // 私 + は + コーヒー + を + 飲み(ます形) + ました
-type 私はコーヒーを飲みました = \`\${PhraseWithParticle<私, "は">}コーヒーを\${ConjugateVerb<飲む, "ます形">}ました\`;
+type 私はコーヒーを飲みました = \`\${PhraseWithParticle<私, "は">}\${コーヒー}を\${ConjugateVerb<飲む, "ます形">}ました\`;
 `,
         },
         {
@@ -42,9 +43,10 @@ type 私はコーヒーを飲みました = \`\${PhraseWithParticle<私, "は">}
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type パン = ProperNoun<"パン">;
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
 
-type 私はパンを食べました = \`\${PhraseWithParticle<私, "は">}パンを\${ConjugateVerb<食べる, "ます形">}ました\`;
+type 私はパンを食べました = \`\${PhraseWithParticle<私, "は">}\${パン}を\${ConjugateVerb<食べる, "ます形">}ました\`;
 `,
         },
         {
@@ -79,10 +81,11 @@ type 田中さんは来ました = \`\${PhraseWithParticle<田中さん, "は">}
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type お酒 = ProperNoun<"お酒">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
 
 // ます形(飲み) + ませんでした
-type 私はお酒を飲みませんでした = \`\${PhraseWithParticle<私, "は">}お酒を\${ConjugateVerb<飲む, "ます形">}ませんでした\`;
+type 私はお酒を飲みませんでした = \`\${PhraseWithParticle<私, "は">}\${お酒}を\${ConjugateVerb<飲む, "ます形">}ませんでした\`;
 `,
         },
         {
@@ -93,10 +96,11 @@ type 私はお酒を飲みませんでした = \`\${PhraseWithParticle<私, "は
           code: `import type { ProperNoun, IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 勉強 + し(ます形 of する) + ませんでした
-type 私は勉強しませんでした = \`\${PhraseWithParticle<私, "は">}勉強\${ConjugateVerb<する, "ます形">}ませんでした\`;
+type 私は勉強しませんでした = \`\${PhraseWithParticle<私, "は">}\${勉強}\${ConjugateVerb<する, "ます形">}ませんでした\`;
 `,
         },
       ],

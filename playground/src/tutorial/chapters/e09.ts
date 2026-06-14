@@ -108,11 +108,12 @@ type コーヒーよりお茶のほうがいいです = \`\${コーヒー}より
           code: `import type { ProperNoun, PhraseWithParticle, NaAdjective, ConjugateAdjective } from "typed-japanese";
 
 type 果物 = ProperNoun<"果物">;
+type 中 = ProperNoun<"中">;
 type りんご = ProperNoun<"りんご">;
 type 好き = NaAdjective & { stem: "好き" };
 
-// 果物 + の中で + りんご + が + いちばん + 好きです
-type 果物の中でりんごがいちばん好きです = \`\${果物}の中で\${PhraseWithParticle<りんご, "が">}いちばん\${ConjugateAdjective<好き, "丁寧形">}\`;
+// 果物 + の + 中 + で + りんご + が + いちばん + 好きです
+type 果物の中でりんごがいちばん好きです = \`\${PhraseWithParticle<果物, "の">}\${中}で\${PhraseWithParticle<りんご, "が">}いちばん\${ConjugateAdjective<好き, "丁寧形">}\`;
 `,
         },
         {
@@ -123,11 +124,13 @@ type 果物の中でりんごがいちばん好きです = \`\${果物}の中で
           code: `import type { ProperNoun, PhraseWithParticle, IAdjective, ConjugateAdjective } from "typed-japanese";
 
 type クラス = ProperNoun<"クラス">;
+type 中 = ProperNoun<"中">;
 type 田中さん = ProperNoun<"田中さん">;
+type 背 = ProperNoun<"背">;
 type 高い = IAdjective & { stem: "高"; ending: "い" };
 
-// クラス + の中で + 田中さん + が + いちばん + 背が + 高いです
-type クラスの中で田中さんがいちばん背が高いです = \`\${クラス}の中で\${PhraseWithParticle<田中さん, "が">}いちばん\${PhraseWithParticle<"背", "が">}\${ConjugateAdjective<高い, "丁寧形">}\`;
+// クラス + の + 中 + で + 田中さん + が + いちばん + 背 + が + 高いです
+type クラスの中で田中さんがいちばん背が高いです = \`\${PhraseWithParticle<クラス, "の">}\${中}で\${PhraseWithParticle<田中さん, "が">}いちばん\${PhraseWithParticle<背, "が">}\${ConjugateAdjective<高い, "丁寧形">}\`;
 `,
         },
       ],

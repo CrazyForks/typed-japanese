@@ -28,10 +28,11 @@ const chapter: Chapter = {
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type パン = ProperNoun<"パン">;
 type 食べる = IchidanVerb & { type: "ichidan"; stem: "食べ"; ending: "る" };
 
 // 私 + は + パン + を + 食べて(て形) + います
-type 私はパンを食べています = \`\${PhraseWithParticle<私, "は">}パンを\${ConjugateVerb<食べる, "て形">}います\`;
+type 私はパンを食べています = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<パン, "を">}\${ConjugateVerb<食べる, "て形">}います\`;
 `,
         },
         {
@@ -42,10 +43,11 @@ type 私はパンを食べています = \`\${PhraseWithParticle<私, "は">}パ
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 弟 = ProperNoun<"弟">;
+type 本 = ProperNoun<"本">;
 type 読む = GodanVerb & { type: "godan"; stem: "読"; ending: "む" };
 
 // 読む(む godan) → て形 = 読んで → 読んでいます
-type 弟は本を読んでいます = \`\${PhraseWithParticle<弟, "は">}本を\${ConjugateVerb<読む, "て形">}います\`;
+type 弟は本を読んでいます = \`\${PhraseWithParticle<弟, "は">}\${PhraseWithParticle<本, "を">}\${ConjugateVerb<読む, "て形">}います\`;
 `,
         },
       ],
@@ -67,10 +69,11 @@ type 弟は本を読んでいます = \`\${PhraseWithParticle<弟, "は">}本を
           code: `import type { ProperNoun, IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 姉 = ProperNoun<"姉">;
+type 結婚 = ProperNoun<"結婚">;
 type する = IrregularVerb & { type: "irregular"; dictionary: "する" };
 
 // 結婚 + する → て形 = して → 結婚しています (resultant state: is married)
-type 姉は結婚しています = \`\${PhraseWithParticle<姉, "は">}結婚\${ConjugateVerb<する, "て形">}います\`;
+type 姉は結婚しています = \`\${PhraseWithParticle<姉, "は">}\${結婚}\${ConjugateVerb<する, "て形">}います\`;
 `,
         },
         {
@@ -81,10 +84,11 @@ type 姉は結婚しています = \`\${PhraseWithParticle<姉, "は">}結婚\${
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type 人 = ProperNoun<"人">;
 type 知る = GodanVerb & { type: "godan"; stem: "知"; ending: "る" };
 
 // 知る(る godan) → て形 = 知って → 知っています (state: know)
-type 私はその人を知っています = \`\${PhraseWithParticle<私, "は">}その人を\${ConjugateVerb<知る, "て形">}います\`;
+type 私はその人を知っています = \`\${PhraseWithParticle<私, "は">}その\${PhraseWithParticle<人, "を">}\${ConjugateVerb<知る, "て形">}います\`;
 `,
         },
         {
@@ -136,10 +140,13 @@ type 父は銀行で働いています = \`\${PhraseWithParticle<父, "は">}\${
           code: `import type { ProperNoun, IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type 毎日 = ProperNoun<"毎日">;
+type 日本語 = ProperNoun<"日本語">;
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { type: "irregular"; dictionary: "する" };
 
 // 毎日 (every day) marks the habitual reading; 勉強 + して + います
-type 私は毎日日本語を勉強しています = \`\${PhraseWithParticle<私, "は">}毎日日本語を勉強\${ConjugateVerb<する, "て形">}います\`;
+type 私は毎日日本語を勉強しています = \`\${PhraseWithParticle<私, "は">}\${毎日}\${PhraseWithParticle<日本語, "を">}\${勉強}\${ConjugateVerb<する, "て形">}います\`;
 `,
         },
       ],
@@ -172,12 +179,14 @@ type 彼はまだ来ていません = \`\${PhraseWithParticle<彼, "は">}まだ
           reading: "いまなにをかいていますか",
           en: "What are you writing now?",
           zh: "你现在在写什么?",
-          code: `import type { GodanVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
+type 今 = ProperNoun<"今">;
+type 何 = ProperNoun<"何">;
 type 書く = GodanVerb & { type: "godan"; stem: "書"; ending: "く" };
 
 // 書く → て形 = 書いて → 書いていますか (question)
-type 今何を書いていますか = \`今何を\${ConjugateVerb<書く, "て形">}いますか\`;
+type 今何を書いていますか = \`\${今}\${PhraseWithParticle<何, "を">}\${ConjugateVerb<書く, "て形">}いますか\`;
 `,
         },
       ],

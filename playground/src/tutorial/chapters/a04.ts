@@ -31,7 +31,7 @@ type 私 = ProperNoun<"私">;
 type 行く = GodanVerb & { stem: "行"; ending: "く" };
 
 // 私 は + 行か (ない形 stem) + ざるを得ない
-type 私は行かざるを得ない = \`\${PhraseWithParticle<私, "は">}\${ConjugateVerb<行く, "ない形">}ざるを得ない\`;
+type 私は行かざるを得ない = \`\${PhraseWithParticle<私, "は">}\${ConjugateVerb<行く, "ない形">}\${ProperNoun<"ざるを得ない">}\`;
 `,
         },
         {
@@ -45,7 +45,7 @@ type 失敗 = ProperNoun<"失敗">;
 type 認める = IchidanVerb & { stem: "認め"; ending: "る" };
 
 // 失敗 を + 認め (ない形 stem) + ざるを得ない
-type 失敗を認めざるを得ない = \`\${PhraseWithParticle<失敗, "を">}\${ConjugateVerb<認める, "ない形">}ざるを得ない\`;
+type 失敗を認めざるを得ない = \`\${PhraseWithParticle<失敗, "を">}\${ConjugateVerb<認める, "ない形">}\${ProperNoun<"ざるを得ない">}\`;
 `,
         },
       ],
@@ -69,8 +69,8 @@ type 失敗を認めざるを得ない = \`\${PhraseWithParticle<失敗, "を">}
 type 私 = ProperNoun<"私">;
 type 我慢 = ProperNoun<"我慢">;
 
-// する verb: classical base せ → 我慢せざるを得ない (せ spelled literally)
-type 私は我慢せざるを得ない = \`\${PhraseWithParticle<私, "は">}\${我慢}せざるを得ない\`;
+// する verb: classical base せ → 我慢 + せざるを得ない
+type 私は我慢せざるを得ない = \`\${PhraseWithParticle<私, "は">}\${我慢}\${ProperNoun<"せざるを得ない">}\`;
 `,
         },
         {
@@ -84,7 +84,7 @@ type 計画 = ProperNoun<"計画">;
 type 中止 = ProperNoun<"中止">;
 
 // 計画 を + 中止 + せざるを得ない
-type 計画を中止せざるを得ない = \`\${PhraseWithParticle<計画, "を">}\${中止}せざるを得ない\`;
+type 計画を中止せざるを得ない = \`\${PhraseWithParticle<計画, "を">}\${中止}\${ProperNoun<"せざるを得ない">}\`;
 `,
         },
       ],

@@ -25,12 +25,13 @@ const chapter: Chapter = {
           reading: "たべるのがすきです",
           en: "I like eating.",
           zh: "我喜欢吃东西。",
-          code: `import type { IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
+          code: `import type { IchidanVerb, ConjugateVerb, NaAdjective, ConjugateAdjective, PhraseWithParticle } from "typed-japanese";
 
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
+type 好き = NaAdjective & { stem: "好き" };
 
-// 食べる (辞書形) + の (nominalizer) + が + 好きです
-type 食べるのが好きです = \`\${PhraseWithParticle<\`\${ConjugateVerb<食べる, "辞書形">}の\`, "が">}好きです\`;
+// 食べる (辞書形) + の (nominalizer) + が + 好き (丁寧形 = 好きです)
+type 食べるのが好きです = \`\${PhraseWithParticle<\`\${ConjugateVerb<食べる, "辞書形">}の\`, "が">}\${ConjugateAdjective<好き, "丁寧形">}\`;
 `,
         },
         {

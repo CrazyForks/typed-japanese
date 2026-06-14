@@ -43,11 +43,12 @@ type 私はコーヒーを飲みます = \`\${PhraseWithParticle<私, "は">}\${
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type 毎日 = ProperNoun<"毎日">;
 type ご飯 = ProperNoun<"ご飯">;
 type 食べる = IchidanVerb & { type: "ichidan"; stem: "食べ"; ending: "る" };
 
 // 私 + は + 毎日 + ご飯 + を + 食べ(ます形) + ます
-type 私は毎日ご飯を食べます = \`\${PhraseWithParticle<私, "は">}毎日\${PhraseWithParticle<ご飯, "を">}\${ConjugateVerb<食べる, "ます形">}ます\`;
+type 私は毎日ご飯を食べます = \`\${PhraseWithParticle<私, "は">}\${毎日}\${PhraseWithParticle<ご飯, "を">}\${ConjugateVerb<食べる, "ます形">}ます\`;
 `,
         },
       ],
@@ -161,11 +162,12 @@ type コーヒーを飲みますか = \`\${PhraseWithParticle<コーヒー, "を
           zh: "要不要一起吃饭?",
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
+type 一緒に = ProperNoun<"一緒に">;
 type ご飯 = ProperNoun<"ご飯">;
 type 食べる = IchidanVerb & { type: "ichidan"; stem: "食べ"; ending: "る" };
 
 // 一緒に + ご飯 + を + 食べ(ます形) + ませんか
-type 一緒にご飯を食べませんか = \`一緒に\${PhraseWithParticle<ご飯, "を">}\${ConjugateVerb<食べる, "ます形">}ませんか\`;
+type 一緒にご飯を食べませんか = \`\${一緒に}\${PhraseWithParticle<ご飯, "を">}\${ConjugateVerb<食べる, "ます形">}ませんか\`;
 `,
         },
       ],

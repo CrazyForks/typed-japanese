@@ -42,10 +42,11 @@ type 子供は遊ぶものだ = \`\${PhraseWithParticle<子供, "は">}\${Conjug
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 時間 = ProperNoun<"時間">;
+type 早く = ProperNoun<"早く">;
 type 過ぎる = IchidanVerb & { stem: "過ぎ"; ending: "る" };
 
 // 時間 + は + 早く + 過ぎる(辞書形) + ものだ
-type 時間は早く過ぎるものだ = \`\${PhraseWithParticle<時間, "は">}早く\${ConjugateVerb<過ぎる, "辞書形">}ものだ\`;
+type 時間は早く過ぎるものだ = \`\${PhraseWithParticle<時間, "は">}\${早く}\${ConjugateVerb<過ぎる, "辞書形">}ものだ\`;
 `,
         },
       ],
@@ -103,12 +104,14 @@ type 子供の頃はよく遊んだものだ = \`\${PhraseWithParticle<子供の
           reading: "まいにちれんしゅうすることだ",
           en: "The thing to do is to practise every day.",
           zh: "你要做的就是每天练习。",
-          code: `import type { IrregularVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
+type 毎日 = ProperNoun<"毎日">;
+type 練習 = ProperNoun<"練習">;
 type 練習する = IrregularVerb & { dictionary: "する" };
 
 // 毎日 + 練習 + する(辞書形) + ことだ
-type 毎日練習することだ = \`毎日練習\${ConjugateVerb<練習する, "辞書形">}ことだ\`;
+type 毎日練習することだ = \`\${毎日}\${練習}\${ConjugateVerb<練習する, "辞書形">}ことだ\`;
 `,
         },
         {
@@ -154,12 +157,13 @@ type 素晴らしいことだ = \`\${ConjugateAdjective<素晴らしい, "基本
           reading: "ほんとうにしあわせなことだ",
           en: "It really is a happy thing!",
           zh: "真是一件幸福的事啊!",
-          code: `import type { NaAdjective, ConjugateAdjective } from "typed-japanese";
+          code: `import type { ProperNoun, NaAdjective, ConjugateAdjective } from "typed-japanese";
 
+type 本当に = ProperNoun<"本当に">;
 type 幸せ = NaAdjective & { stem: "幸せ" };
 
 // 本当に + 幸せ(基本形=幸せな) + ことだ
-type 本当に幸せなことだ = \`本当に\${ConjugateAdjective<幸せ, "基本形">}ことだ\`;
+type 本当に幸せなことだ = \`\${本当に}\${ConjugateAdjective<幸せ, "基本形">}ことだ\`;
 `,
         },
       ],

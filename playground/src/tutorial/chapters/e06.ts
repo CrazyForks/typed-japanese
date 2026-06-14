@@ -28,10 +28,11 @@ const chapter: Chapter = {
           code: `import type { ProperNoun, PhraseWithParticle, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
 type 図書館 = ProperNoun<"図書館">;
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 図書館 + で (place of action) + 勉強 + します
-type 図書館で勉強します = \`\${PhraseWithParticle<図書館, "で">}勉強\${ConjugateVerb<する, "ます形">}ます\`;
+type 図書館で勉強します = \`\${PhraseWithParticle<図書館, "で">}\${勉強}\${ConjugateVerb<する, "ます形">}ます\`;
 `,
         },
         {

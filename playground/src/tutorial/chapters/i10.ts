@@ -94,11 +94,12 @@ type 本当のことを言うべきだ = \`\${PhraseWithParticle<本当のこと
           zh: "你应该马上去医院。",
           code: `import type { ProperNoun, PhraseWithParticle, GodanVerb, ConjugateVerb } from "typed-japanese";
 
+type 今すぐ = ProperNoun<"今すぐ">;
 type 病院 = ProperNoun<"病院">;
 type 行く = GodanVerb & { stem: "行"; ending: "く" };
 
 // 今すぐ + 病院 + へ + 行く (辞書形) + べきです
-type 今すぐ病院へ行くべきです = \`今すぐ\${PhraseWithParticle<病院, "へ">}\${ConjugateVerb<行く, "辞書形">}べきです\`;
+type 今すぐ病院へ行くべきです = \`\${今すぐ}\${PhraseWithParticle<病院, "へ">}\${ConjugateVerb<行く, "辞書形">}べきです\`;
 `,
         },
         {
@@ -144,12 +145,14 @@ type 寒いわけだ = \`\${ConjugateAdjective<寒い, "基本形">}わけだ\`;
           reading: "まいにちべんきょうしたわけです",
           en: "So that means you studied every day.",
           zh: "这么说,你是每天都学习了。",
-          code: `import type { IrregularVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
+type 毎日 = ProperNoun<"毎日">;
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 毎日 + 勉強 + した (た形) + わけです
-type 毎日勉強したわけです = \`毎日勉強\${ConjugateVerb<する, "た形">}わけです\`;
+type 毎日勉強したわけです = \`\${毎日}\${勉強}\${ConjugateVerb<する, "た形">}わけです\`;
 `,
         },
         {

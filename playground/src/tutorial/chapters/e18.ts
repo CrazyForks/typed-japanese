@@ -178,10 +178,11 @@ type 漢字が読める = \`\${PhraseWithParticle<漢字, "が">}\${ConjugateVer
 
 type 私 = ProperNoun<"私">;
 type 車 = ProperNoun<"車">;
+type 運転 = ProperNoun<"運転">;
 type 運転する = IrregularVerb & { dictionary: "する" };
 
-// 運転する → 運転できる; here we spell 運転 then できる via 可能形 + る
-type 私は車が運転できる = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<車, "が">}運転\${ConjugateVerb<運転する, "可能形">}る\`;
+// 運転する → 運転できる; 運転 as a noun then できる via 可能形 + る
+type 私は車が運転できる = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<車, "が">}\${運転}\${ConjugateVerb<運転する, "可能形">}る\`;
 `,
         },
       ],

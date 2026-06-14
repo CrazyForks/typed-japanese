@@ -118,12 +118,13 @@ type ここで待ってください = \`\${PhraseWithParticle<ここ, "で">}\${
 
 type ご飯 = ProperNoun<"ご飯">;
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // ご飯を + [食べる て形] + から
 type ご飯を食べてから = \`\${PhraseWithParticle<ご飯, "を">}\${ConjugateVerb<食べる, "て形">}から\`;
 // 勉強 + [する ます形] + ます
-type 勉強します = \`勉強\${ConjugateVerb<する, "ます形">}ます\`;
+type 勉強します = \`\${勉強}\${ConjugateVerb<する, "ます形">}ます\`;
 
 type ご飯を食べてから勉強します = ConnectedPhrases<ご飯を食べてから, 勉強します>;
 `,

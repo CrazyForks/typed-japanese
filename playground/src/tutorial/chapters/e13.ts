@@ -28,10 +28,11 @@ const chapter: Chapter = {
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type コーヒー = ProperNoun<"コーヒー">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
 
 // 私 + は + コーヒー + を + 飲む (plain non-past)
-type 私はコーヒーを飲む = \`\${PhraseWithParticle<私, "は">}コーヒーを\${ConjugateVerb<飲む, "辞書形">}\`;
+type 私はコーヒーを飲む = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<コーヒー, "を">}\${ConjugateVerb<飲む, "辞書形">}\`;
 `,
         },
         {
@@ -41,11 +42,12 @@ type 私はコーヒーを飲む = \`\${PhraseWithParticle<私, "は">}コーヒ
           zh: "明天来学校。",
           code: `import type { ProperNoun, IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
+type 明日 = ProperNoun<"明日">;
 type 学校 = ProperNoun<"学校">;
 type 来る = IrregularVerb & { dictionary: "来る" };
 
 // 明日 + 学校 + へ + 来る (plain non-past)
-type 明日学校へ来る = \`明日\${PhraseWithParticle<学校, "へ">}\${ConjugateVerb<来る, "辞書形">}\`;
+type 明日学校へ来る = \`\${明日}\${PhraseWithParticle<学校, "へ">}\${ConjugateVerb<来る, "辞書形">}\`;
 `,
         },
       ],
@@ -67,10 +69,11 @@ type 明日学校へ来る = \`明日\${PhraseWithParticle<学校, "へ">}\${Con
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type パン = ProperNoun<"パン">;
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
 
 // 私 + は + パン + を + 食べた (plain past)
-type 私はパンを食べた = \`\${PhraseWithParticle<私, "は">}パンを\${ConjugateVerb<食べる, "た形">}\`;
+type 私はパンを食べた = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<パン, "を">}\${ConjugateVerb<食べる, "た形">}\`;
 `,
         },
         {
@@ -81,10 +84,11 @@ type 私はパンを食べた = \`\${PhraseWithParticle<私, "は">}パンを\${
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 友達 = ProperNoun<"友達">;
+type お茶 = ProperNoun<"お茶">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
 
 // 友達 + と + お茶 + を + 飲んだ (plain past)
-type 友達とお茶を飲んだ = \`\${PhraseWithParticle<友達, "と">}お茶を\${ConjugateVerb<飲む, "た形">}\`;
+type 友達とお茶を飲んだ = \`\${PhraseWithParticle<友達, "と">}\${PhraseWithParticle<お茶, "を">}\${ConjugateVerb<飲む, "た形">}\`;
 `,
         },
       ],
@@ -106,10 +110,11 @@ type 友達とお茶を飲んだ = \`\${PhraseWithParticle<友達, "と">}お茶
           code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 今日 = ProperNoun<"今日">;
+type 肉 = ProperNoun<"肉">;
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
 
 // 今日 + は + 肉 + を + 食べ + ない (plain negative)
-type 今日は肉を食べない = \`\${PhraseWithParticle<今日, "は">}肉を\${ConjugateVerb<食べる, "ない形">}ない\`;
+type 今日は肉を食べない = \`\${PhraseWithParticle<今日, "は">}\${PhraseWithParticle<肉, "を">}\${ConjugateVerb<食べる, "ない形">}ない\`;
 `,
         },
         {
@@ -120,10 +125,11 @@ type 今日は肉を食べない = \`\${PhraseWithParticle<今日, "は">}肉を
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 私 = ProperNoun<"私">;
+type お酒 = ProperNoun<"お酒">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
 
 // 私 + は + お酒 + を + 飲ま + ない (plain negative)
-type 私はお酒を飲まない = \`\${PhraseWithParticle<私, "は">}お酒を\${ConjugateVerb<飲む, "ない形">}ない\`;
+type 私はお酒を飲まない = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<お酒, "を">}\${ConjugateVerb<飲む, "ない形">}ない\`;
 `,
         },
       ],
@@ -182,12 +188,13 @@ type これは私の本だ = \`\${PhraseWithParticle<これ, "は">}\${PhraseWit
           reading: "あしたもくるよ",
           en: "I'll come tomorrow too, you know.",
           zh: "明天也会来哦。",
-          code: `import type { IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
+          code: `import type { ProperNoun, IrregularVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
+type 明日 = ProperNoun<"明日">;
 type 来る = IrregularVerb & { dictionary: "来る" };
 
 // 明日 + も + 来る + よ
-type 明日も来るよ = \`明日も\${PhraseWithParticle<ConjugateVerb<来る, "辞書形">, "よ">}\`;
+type 明日も来るよ = \`\${PhraseWithParticle<明日, "も">}\${PhraseWithParticle<ConjugateVerb<来る, "辞書形">, "よ">}\`;
 `,
         },
         {

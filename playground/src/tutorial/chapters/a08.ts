@@ -40,14 +40,14 @@ type 彼は休むことなく働く = \`\${PhraseWithParticle<彼, "は">}\${Con
           reading: "かのじょはあきらめることなくつづけた",
           en: "She kept going without giving up.",
           zh: "她毫不放弃地坚持了下去。",
-          code: `import type { ProperNoun, IchidanVerb, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
+          code: `import type { ProperNoun, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 彼女 = ProperNoun<"彼女">;
 type あきらめる = IchidanVerb & { stem: "あきらめ"; ending: "る" };
-type 続く = GodanVerb & { stem: "続"; ending: "く" };
+type 続ける = IchidanVerb & { stem: "続け"; ending: "る" };
 
-// 彼女 + は + あきらめる(辞書形) + ことなく + 続け(可能形は不要) → 続けた は 続ける の た形だが、ここでは literal で続けた
-type 彼女はあきらめることなく続けた = \`\${PhraseWithParticle<彼女, "は">}\${ConjugateVerb<あきらめる, "辞書形">}ことなく続けた\`;
+// 彼女 + は + あきらめる(辞書形) + ことなく + 続けた(た形)
+type 彼女はあきらめることなく続けた = \`\${PhraseWithParticle<彼女, "は">}\${ConjugateVerb<あきらめる, "辞書形">}ことなく\${ConjugateVerb<続ける, "た形">}\`;
 `,
         },
       ],
@@ -70,9 +70,10 @@ type 彼女はあきらめることなく続けた = \`\${PhraseWithParticle<彼
 
 type 何 = ProperNoun<"何">;
 type 言う = GodanVerb & { stem: "言"; ending: "う" };
+type 帰る = GodanVerb & { stem: "帰"; ending: "る" };
 
-// 何 + も + 言わ(ない形) + ずに + 帰った(literal)
-type 何も言わずに帰った = \`\${PhraseWithParticle<何, "も">}\${ConjugateVerb<言う, "ない形">}ずに帰った\`;
+// 何 + も + 言わ(ない形) + ずに + 帰った(た形)
+type 何も言わずに帰った = \`\${PhraseWithParticle<何, "も">}\${ConjugateVerb<言う, "ない形">}ずに\${ConjugateVerb<帰る, "た形">}\`;
 `,
         },
         {
@@ -96,12 +97,13 @@ type 朝ご飯を食べずに学校へ行く = \`\${PhraseWithParticle<朝ご飯
           reading: "よやくせずにきた",
           en: "I came without making a reservation.",
           zh: "我没预约就来了。",
-          code: `import type { ProperNoun, PhraseWithParticle } from "typed-japanese";
+          code: `import type { ProperNoun, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
 type 予約 = ProperNoun<"予約">;
+type 来る = IrregularVerb & { dictionary: "来る" };
 
-// する is irregular here: する → せずに (NOT しずに). Spelled as a literal.
-type 予約せずに来た = \`\${予約}せずに来た\`;
+// する is irregular here: する → せずに (せ is kana, kept literal); 来 + た形(来た)
+type 予約せずに来た = \`\${予約}せずに\${ConjugateVerb<来る, "た形">}\`;
 `,
         },
       ],
@@ -123,10 +125,12 @@ type 予約せずに来た = \`\${予約}せずに来た\`;
           code: `import type { ProperNoun, PhraseWithParticle } from "typed-japanese";
 
 type わさび = ProperNoun<"わさび">;
+type 抜き = ProperNoun<"抜き">;
 type 寿司 = ProperNoun<"寿司">;
+type 注文 = ProperNoun<"注文">;
 
-// わさび + 抜きで + 寿司 + を + 注文した(literal)
-type わさび抜きで寿司を注文した = \`\${わさび}抜きで\${PhraseWithParticle<寿司, "を">}注文した\`;
+// わさび + 抜き + で + 寿司 + を + 注文 + した(kana)
+type わさび抜きで寿司を注文した = \`\${わさび}\${抜き}で\${PhraseWithParticle<寿司, "を">}\${注文}した\`;
 `,
         },
         {
@@ -137,10 +141,11 @@ type わさび抜きで寿司を注文した = \`\${わさび}抜きで\${Phrase
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb } from "typed-japanese";
 
 type 冗談 = ProperNoun<"冗談">;
+type 抜き = ProperNoun<"抜き">;
 type 話す = GodanVerb & { stem: "話"; ending: "す" };
 
-// 冗談 + 抜きで + 話そ(意向形) + う
-type 冗談抜きで話そう = \`\${冗談}抜きで\${ConjugateVerb<話す, "意向形">}う\`;
+// 冗談 + 抜き + で + 話そ(意向形) + う
+type 冗談抜きで話そう = \`\${冗談}\${抜き}で\${ConjugateVerb<話す, "意向形">}う\`;
 `,
         },
       ],
