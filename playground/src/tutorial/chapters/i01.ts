@@ -94,10 +94,11 @@ type 私は先生に叱られた = \`\${PhraseWithParticle<私, "は">}\${Phrase
 
 type 私 = ProperNoun<"私">;
 type 友達 = ProperNoun<"友達">;
+type 招待 = ProperNoun<"招待">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 招待する is a noun + する verb: 招待 + され(受身形) + た
-type 私は友達に招待された = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<友達, "に">}招待\${ConjugateVerb<する, "受身形">}た\`;
+type 私は友達に招待された = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<友達, "に">}\${招待}\${ConjugateVerb<する, "受身形">}た\`;
 `,
         },
         {

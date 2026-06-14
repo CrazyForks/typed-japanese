@@ -110,11 +110,12 @@ type 新年にあたって決意した = \`\${新年}にあたって\${決意}\$
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 卒業 = ProperNoun<"卒業">;
+type に際して = ProperNoun<"に際して">;
 type 写真 = ProperNoun<"写真">;
 type 撮る = GodanVerb & { stem: "撮"; ending: "る" };
 
 // 卒業 + に際して + 写真 を + 撮った (た形)
-type 卒業に際して写真を撮った = \`\${卒業}に際して\${PhraseWithParticle<写真, "を">}\${ConjugateVerb<撮る, "た形">}\`;
+type 卒業に際して写真を撮った = \`\${卒業}\${に際して}\${PhraseWithParticle<写真, "を">}\${ConjugateVerb<撮る, "た形">}\`;
 `,
         },
         {
@@ -125,11 +126,12 @@ type 卒業に際して写真を撮った = \`\${卒業}に際して\${PhraseWit
           code: `import type { ProperNoun, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
 type 契約 = ProperNoun<"契約">;
+type に際して = ProperNoun<"に際して">;
 type 説明 = ProperNoun<"説明">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 契約 + に際して + 説明 + する (辞書形)
-type 契約に際して説明する = \`\${契約}に際して\${説明}\${ConjugateVerb<する, "辞書形">}\`;
+type 契約に際して説明する = \`\${契約}\${に際して}\${説明}\${ConjugateVerb<する, "辞書形">}\`;
 `,
         },
       ],

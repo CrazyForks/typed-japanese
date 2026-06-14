@@ -60,10 +60,11 @@ type 忘れないように名前を書きます = \`\${ConjugateVerb<忘れる, 
 
 type 漢字 = ProperNoun<"漢字">;
 type 読む = GodanVerb & { stem: "読"; ending: "む" };
+type 勉強 = ProperNoun<"勉強">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 漢字が + 読め(可能形) + る + ように + 勉強 + し(ます形) + ます
-type 漢字が読めるように勉強します = \`\${PhraseWithParticle<漢字, "が">}\${ConjugateVerb<読む, "可能形">}るように勉強\${ConjugateVerb<する, "ます形">}ます\`;
+type 漢字が読めるように勉強します = \`\${PhraseWithParticle<漢字, "が">}\${ConjugateVerb<読む, "可能形">}るように\${勉強}\${ConjugateVerb<する, "ます形">}ます\`;
 `,
         },
       ],
@@ -136,12 +137,14 @@ type 夢のような話 = \`\${PhraseWithParticle<夢, "の">}ような\${話}\`
           reading: "まいにちうんどうするようにします",
           en: "I'll make an effort to exercise every day.",
           zh: "我会尽量做到每天运动。",
-          code: `import type { IrregularVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
+type 毎日 = ProperNoun<"毎日">;
+type 運動 = ProperNoun<"運動">;
 type する = IrregularVerb & { dictionary: "する" };
 
-// 毎日運動 + する(辞書形) + ように + し(ます形) + ます
-type 毎日運動するようにします = \`毎日運動\${ConjugateVerb<する, "辞書形">}ように\${ConjugateVerb<する, "ます形">}ます\`;
+// 毎日 + 運動 + する(辞書形) + ように + し(ます形) + ます
+type 毎日運動するようにします = \`\${毎日}\${運動}\${ConjugateVerb<する, "辞書形">}ように\${ConjugateVerb<する, "ます形">}ます\`;
 `,
         },
         {
@@ -164,13 +167,14 @@ type お酒を飲まないようにしています = \`\${PhraseWithParticle<お
           reading: "はやくねるようにしてください",
           en: "Please try to go to bed early.",
           zh: "请尽量早点睡。",
-          code: `import type { IchidanVerb, IrregularVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, IchidanVerb, IrregularVerb, ConjugateVerb } from "typed-japanese";
 
+type 早く = ProperNoun<"早く">;
 type 寝る = IchidanVerb & { stem: "寝"; ending: "る" };
 type する = IrregularVerb & { dictionary: "する" };
 
 // 早く + 寝る(辞書形) + ように + し(て形) + ください
-type 早く寝るようにしてください = \`早く\${ConjugateVerb<寝る, "辞書形">}ように\${ConjugateVerb<する, "て形">}ください\`;
+type 早く寝るようにしてください = \`\${早く}\${ConjugateVerb<寝る, "辞書形">}ように\${ConjugateVerb<する, "て形">}ください\`;
 `,
         },
       ],

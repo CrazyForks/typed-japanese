@@ -42,11 +42,12 @@ type 私は寿司を食べる = \`\${PhraseWithParticle<私, "は">}\${PhraseWit
           zh: "(我)每天看书。",
           code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
+type 毎日 = ProperNoun<"毎日">;
 type 本 = ProperNoun<"本">;
 type 読む = GodanVerb & { stem: "読"; ending: "む" };
 
 // 毎日 + 本 + を + 読む(辞書形)
-type 毎日本を読む = \`毎日\${PhraseWithParticle<本, "を">}\${ConjugateVerb<読む, "辞書形">}\`;
+type 毎日本を読む = \`\${毎日}\${PhraseWithParticle<本, "を">}\${ConjugateVerb<読む, "辞書形">}\`;
 `,
         },
       ],

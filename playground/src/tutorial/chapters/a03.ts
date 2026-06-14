@@ -25,12 +25,13 @@ const chapter: Chapter = {
           reading: "どうりでねむいわけだ",
           en: "No wonder I'm sleepy.",
           zh: "难怪这么困。",
-          code: `import type { IAdjective, ConjugateAdjective } from "typed-japanese";
+          code: `import type { ProperNoun, IAdjective, ConjugateAdjective } from "typed-japanese";
 
+type 道理で = ProperNoun<"道理で">;
 type 眠い = IAdjective & { stem: "眠"; ending: "い" };
 
 // 道理で + 眠い (基本形) + わけだ
-type 道理で眠いわけだ = \`道理で\${ConjugateAdjective<眠い, "基本形">}わけだ\`;
+type 道理で眠いわけだ = \`\${道理で}\${ConjugateAdjective<眠い, "基本形">}わけだ\`;
 `,
         },
         {
@@ -77,12 +78,13 @@ type 彼は日本人なわけだ = \`\${PhraseWithParticle<彼, "は">}\${日本
           reading: "やさいがきらいなわけではない",
           en: "It's not that I dislike vegetables.",
           zh: "我并不是讨厌蔬菜。",
-          code: `import type { ProperNoun, PhraseWithParticle } from "typed-japanese";
+          code: `import type { ProperNoun, PhraseWithParticle, NaAdjective, ConjugateAdjective } from "typed-japanese";
 
 type 野菜 = ProperNoun<"野菜">;
+type 嫌い = NaAdjective & { stem: "嫌い" };
 
-// 野菜 + が + 嫌い + な + わけではない (na-adjective + な)
-type 野菜が嫌いなわけではない = \`\${PhraseWithParticle<野菜, "が">}嫌いなわけではない\`;
+// 野菜 + が + 嫌いな (基本形 → na-adjective + な) + わけではない
+type 野菜が嫌いなわけではない = \`\${PhraseWithParticle<野菜, "が">}\${ConjugateAdjective<嫌い, "基本形">}わけではない\`;
 `,
         },
         {
@@ -90,12 +92,13 @@ type 野菜が嫌いなわけではない = \`\${PhraseWithParticle<野菜, "が
           reading: "ぜんぶわかるわけではない",
           en: "I don't necessarily understand all of it.",
           zh: "我未必全都懂。",
-          code: `import type { GodanVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, GodanVerb, ConjugateVerb } from "typed-japanese";
 
+type 全部 = ProperNoun<"全部">;
 type わかる = GodanVerb & { stem: "わか"; ending: "る" };
 
 // 全部 + わかる (辞書形) + わけではない
-type 全部わかるわけではない = \`全部\${ConjugateVerb<わかる, "辞書形">}わけではない\`;
+type 全部わかるわけではない = \`\${全部}\${ConjugateVerb<わかる, "辞書形">}わけではない\`;
 `,
         },
         {
@@ -128,12 +131,13 @@ type この店が高いわけではない = \`\${PhraseWithParticle<この店, "
           reading: "いまかえるわけにはいかない",
           en: "I can't just leave now.",
           zh: "现在不能就这样回去。",
-          code: `import type { GodanVerb, ConjugateVerb } from "typed-japanese";
+          code: `import type { ProperNoun, GodanVerb, ConjugateVerb } from "typed-japanese";
 
+type 今 = ProperNoun<"今">;
 type 帰る = GodanVerb & { stem: "帰"; ending: "る" };
 
 // 今 + 帰る (辞書形) + わけにはいかない
-type 今帰るわけにはいかない = \`今\${ConjugateVerb<帰る, "辞書形">}わけにはいかない\`;
+type 今帰るわけにはいかない = \`\${今}\${ConjugateVerb<帰る, "辞書形">}わけにはいかない\`;
 `,
         },
         {

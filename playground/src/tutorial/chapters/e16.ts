@@ -25,13 +25,15 @@ const chapter: Chapter = {
           reading: "あめがふったら、いえにいます",
           en: "If it rains, I'll stay home.",
           zh: "如果下雨,我就待在家里。",
-          code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
+          code: `import type { ProperNoun, GodanVerb, IchidanVerb, ConjugateVerb, PhraseWithParticle } from "typed-japanese";
 
 type 雨 = ProperNoun<"雨">;
 type 降る = GodanVerb & { stem: "降"; ending: "る" };
+type 家 = ProperNoun<"家">;
+type いる = IchidanVerb & { stem: "い"; ending: "る" };
 
-// 雨 + が + 降った(た形) + ら、家にいます
-type 雨が降ったら家にいます = \`\${PhraseWithParticle<雨, "が">}\${ConjugateVerb<降る, "た形">}ら、家にいます\`;
+// 雨 + が + 降った(た形) + ら、家 + に + い(ます形) + ます
+type 雨が降ったら家にいます = \`\${PhraseWithParticle<雨, "が">}\${ConjugateVerb<降る, "た形">}ら、\${PhraseWithParticle<家, "に">}\${ConjugateVerb<いる, "ます形">}ます\`;
 `,
         },
         {
@@ -43,10 +45,11 @@ type 雨が降ったら家にいます = \`\${PhraseWithParticle<雨, "が">}\${
 
 type 駅 = ProperNoun<"駅">;
 type 着く = GodanVerb & { stem: "着"; ending: "く" };
+type 電話 = ProperNoun<"電話">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // 駅 + に + 着いた(た形) + ら、電話 + し(ます形) + ます
-type 駅に着いたら電話します = \`\${PhraseWithParticle<駅, "に">}\${ConjugateVerb<着く, "た形">}ら、電話\${ConjugateVerb<する, "ます形">}ます\`;
+type 駅に着いたら電話します = \`\${PhraseWithParticle<駅, "に">}\${ConjugateVerb<着く, "た形">}ら、\${電話}\${ConjugateVerb<する, "ます形">}ます\`;
 `,
         },
         {
@@ -58,9 +61,11 @@ type 駅に着いたら電話します = \`\${PhraseWithParticle<駅, "に">}\${
 
 type 薬 = ProperNoun<"薬">;
 type 飲む = GodanVerb & { stem: "飲"; ending: "む" };
+type 元気 = ProperNoun<"元気">;
+type なる = GodanVerb & { stem: "な"; ending: "る" };
 
-// 薬 + を + 飲んだ(た形) + ら、元気になりました (past result)
-type 薬を飲んだら元気になりました = \`\${PhraseWithParticle<薬, "を">}\${ConjugateVerb<飲む, "た形">}ら、元気になりました\`;
+// 薬 + を + 飲んだ(た形) + ら、元気 + に + なり(ます形) + ました (past result)
+type 薬を飲んだら元気になりました = \`\${PhraseWithParticle<薬, "を">}\${ConjugateVerb<飲む, "た形">}ら、\${PhraseWithParticle<元気, "に">}\${ConjugateVerb<なる, "ます形">}ました\`;
 `,
         },
       ],
@@ -79,13 +84,15 @@ type 薬を飲んだら元気になりました = \`\${PhraseWithParticle<薬, "
           reading: "はるになると、さくらがさきます",
           en: "When spring comes, the cherry blossoms bloom.",
           zh: "一到春天,樱花就开了。",
-          code: `import type { GodanVerb, ConjugateVerb, ConditionalPhrase } from "typed-japanese";
+          code: `import type { ProperNoun, GodanVerb, ConjugateVerb, PhraseWithParticle, ConditionalPhrase } from "typed-japanese";
 
+type 春 = ProperNoun<"春">;
 type なる = GodanVerb & { stem: "な"; ending: "る" };
+type 桜 = ProperNoun<"桜">;
 type 咲く = GodanVerb & { stem: "咲"; ending: "く" };
 
-// 春に + なる(辞書形) + と + 、桜が + 咲き(ます形) + ます
-type 春になると桜が咲きます = ConditionalPhrase<\`春に\${ConjugateVerb<なる, "辞書形">}\`, "と", \`、桜が\${ConjugateVerb<咲く, "ます形">}ます\`>;
+// 春 + に + なる(辞書形) + と + 、桜 + が + 咲き(ます形) + ます
+type 春になると桜が咲きます = ConditionalPhrase<\`\${PhraseWithParticle<春, "に">}\${ConjugateVerb<なる, "辞書形">}\`, "と", \`、\${PhraseWithParticle<桜, "が">}\${ConjugateVerb<咲く, "ます形">}ます\`>;
 `,
         },
         {
@@ -97,10 +104,11 @@ type 春になると桜が咲きます = ConditionalPhrase<\`春に\${ConjugateV
 
 type ボタン = ProperNoun<"ボタン">;
 type 押す = GodanVerb & { stem: "押"; ending: "す" };
+type ドア = ProperNoun<"ドア">;
 type 開く = GodanVerb & { stem: "開"; ending: "く" };
 
-// ボタン + を + 押す(辞書形) + と + 、ドアが + 開き(ます形) + ます
-type ボタンを押すとドアが開きます = ConditionalPhrase<\`\${PhraseWithParticle<ボタン, "を">}\${ConjugateVerb<押す, "辞書形">}\`, "と", \`、ドアが\${ConjugateVerb<開く, "ます形">}ます\`>;
+// ボタン + を + 押す(辞書形) + と + 、ドア + が + 開き(ます形) + ます
+type ボタンを押すとドアが開きます = ConditionalPhrase<\`\${PhraseWithParticle<ボタン, "を">}\${ConjugateVerb<押す, "辞書形">}\`, "と", \`、\${PhraseWithParticle<ドア, "が">}\${ConjugateVerb<開く, "ます形">}ます\`>;
 `,
         },
         {
@@ -112,9 +120,11 @@ type ボタンを押すとドアが開きます = ConditionalPhrase<\`\${PhraseW
 
 type 右 = ProperNoun<"右">;
 type 曲がる = GodanVerb & { stem: "曲が"; ending: "る" };
+type 駅 = ProperNoun<"駅">;
+type ある = GodanVerb & { stem: "あ"; ending: "る" };
 
-// 右 + に + 曲がる(辞書形) + と + 、駅があります
-type 右に曲がると駅があります = ConditionalPhrase<\`\${PhraseWithParticle<右, "に">}\${ConjugateVerb<曲がる, "辞書形">}\`, "と", \`、駅があります\`>;
+// 右 + に + 曲がる(辞書形) + と + 、駅 + が + あり(ます形) + ます
+type 右に曲がると駅があります = ConditionalPhrase<\`\${PhraseWithParticle<右, "に">}\${ConjugateVerb<曲がる, "辞書形">}\`, "と", \`、\${PhraseWithParticle<駅, "が">}\${ConjugateVerb<ある, "ます形">}ます\`>;
 `,
         },
       ],
@@ -152,9 +162,11 @@ type 授業が終わったら休みます = \`\${PhraseWithParticle<授業, "が
 
 type お金 = ProperNoun<"お金">;
 type 入れる = IchidanVerb & { stem: "入れ"; ending: "る" };
+type 切符 = ProperNoun<"切符">;
+type 出る = IchidanVerb & { stem: "出"; ending: "る" };
 
-// お金 + を + 入れる(辞書形) + と + 、切符が出ます  (automatic result → と)
-type お金を入れると切符が出ます = ConditionalPhrase<\`\${PhraseWithParticle<お金, "を">}\${ConjugateVerb<入れる, "辞書形">}\`, "と", \`、切符が出ます\`>;
+// お金 + を + 入れる(辞書形) + と + 、切符 + が + で(ます形) + ます  (automatic result → と)
+type お金を入れると切符が出ます = ConditionalPhrase<\`\${PhraseWithParticle<お金, "を">}\${ConjugateVerb<入れる, "辞書形">}\`, "と", \`、\${PhraseWithParticle<切符, "が">}\${ConjugateVerb<出る, "ます形">}ます\`>;
 `,
         },
       ],

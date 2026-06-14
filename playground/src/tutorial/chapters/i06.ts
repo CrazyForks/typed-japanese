@@ -94,10 +94,11 @@ type 行かなければなりません = \`\${ConjugateVerb<行く, "ない形">
           code: `import type { IrregularVerb, ConjugateVerb, ProperNoun } from "typed-japanese";
 
 type する = IrregularVerb & { dictionary: "する" };
+type 練習 = ProperNoun<"練習">;
 type 上手 = ProperNoun<"上手">;
 
 // する(ない形)=し → 練習し + なければ ; 上手になりません
-type 練習しなければ上手になりません = \`練習\${ConjugateVerb<する, "ない形">}なければ\${上手}になりません\`;
+type 練習しなければ上手になりません = \`\${練習}\${ConjugateVerb<する, "ない形">}なければ\${上手}になりません\`;
 `,
         },
       ],
