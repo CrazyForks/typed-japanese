@@ -45,6 +45,43 @@
   max-width: 52ch;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.langToggle {
+  display: flex;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.langBtn {
+  border: none;
+  background: var(--surface);
+  color: var(--ink-500);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.langBtn:hover {
+  color: var(--sakura-600);
+}
+
+.langActive {
+  background: var(--sakura-500);
+  color: #fff;
+}
+
+.langActive:hover {
+  color: #fff;
+}
+
 .repo {
   flex: none;
   font-size: 0.85rem;
@@ -59,6 +96,43 @@
 
 .repo:hover {
   background: var(--surface-2);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-500);
+  transition: all 0.14s;
+}
+
+.tab:hover {
+  color: var(--sakura-600);
+  border-color: var(--border-strong);
+}
+
+.tabActive {
+  background: var(--sakura-500);
+  color: #fff;
+  border-color: var(--sakura-500);
+  box-shadow: var(--shadow-md);
+}
+
+.tabActive:hover {
+  color: #fff;
 }
 
 .main {

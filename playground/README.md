@@ -3,14 +3,23 @@
 **[Open the live playground →](https://typedgrammar.github.io/typed-japanese/)**
 
 An interactive tool for the [Typed Japanese](../README.md) type-level grammar
-library. Write a Japanese sentence as a TypeScript type and watch how it's
-composed, node by node.
+library, with two parts:
+
+- **📖 Grammar Course** — a bilingual (English / 简体中文) Japanese grammar
+  course spanning **47 chapters** from elementary to advanced (loosely following
+  the 《新标准日本语》 progression). Every example sentence is backed by a
+  self-contained Typed Japanese snippet; click any sentence to open it in the
+  analyzer and see its grammatical structure. All 380+ snippets are verified to
+  type-check **and** resolve to exactly the sentence shown
+  (`pnpm verify:snippets`).
+- **🧪 Playground** — write a Japanese sentence as a TypeScript type and watch
+  how it's composed, node by node.
 
 ![editor + composition tree](../images/demo.png)
 
-## What it does
+## The analyzer
 
-The screen has two halves:
+The analyzer screen has two halves:
 
 - **A real TypeScript editor** (Monaco) with the library's `.d.ts` files loaded.
   It genuinely runs the TypeScript language service — full type-checking, errors,

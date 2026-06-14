@@ -1,0 +1,34 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.snippetBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.chipActive {
+  background: var(--sakura-500);
+  color: #fff;
+  border-color: var(--sakura-500);
+}
+
+.hint {
+  text-align: center;
+  margin: 0;
+}

@@ -177,6 +177,9 @@ export async function buildTree(
   }
 
   function build(node: TS.TypeNode, idPath: string): CompositionNode {
+    // Unwrap parentheses so `(A & B)` etc. don't add a useless level.
+    if (ts.isParenthesizedTypeNode(node)) return build(node.type, idPath);
+
     const start = node.getStart(sf);
     const end = node.getEnd();
     const text = node.getText(sf).trim();
@@ -193,6 +196,38 @@ export async function buildTree(
         start,
         end,
         children: [],
+      };
+    }
+
+    // Template literal type: `${A}いる` — the glue most real sentences use.
+    // Decompose into its literal chunks and embedded type expressions.
+    if (ts.isTemplateLiteralTypeNode(node)) {
+      const chunk = (value: string, k: number): CompositionNode => ({
+        id: `${idPath}.c${k}`,
+        label: `"${value}"`,
+        ctor: null,
+        category: classifyLiteral(value),
+        text: `"${value}"`,
+        start,
+        end,
+        children: [],
+      });
+      const kids: CompositionNode[] = [];
+      let k = 0;
+      if (node.head.text) kids.push(chunk(node.head.text, k++));
+      node.templateSpans.forEach((span, i) => {
+        kids.push(build(span.type, `${idPath}.${i}`));
+        if (span.literal.text) kids.push(chunk(span.literal.text, k++));
+      });
+      return {
+        id: idPath,
+        label: "Template",
+        ctor: "`…`",
+        category: "phrase",
+        text,
+        start,
+        end,
+        children: kids,
       };
     }
 
