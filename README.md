@@ -6,7 +6,7 @@
 
 ![demo](./images/demo.png)
 
-> 🌸 **New: [Interactive Playground](./playground)** — an in-browser TypeScript editor where the compiler resolves conjugations live, plus a Verb Lab, Adjective Lab, Phrase Builder, and Sentence Gallery. Run it with `cd playground && pnpm install && pnpm dev`.
+> 🌸 **New: [Interactive Playground →](https://typedgrammar.github.io/typed-japanese/)** — an in-browser TypeScript editor where the compiler resolves conjugations live, plus a Verb Lab, Adjective Lab, Phrase Builder, and Sentence Gallery. ([source](./playground) · run locally with `cd playground && pnpm install && pnpm dev`)
 
 Typed Japanese is a TypeScript type-level library that enables the expression of complete Japanese sentences through the type system. It creates a domain-specific language (DSL) based on Japanese grammar rules, allowing a subset of grammatically correct natural language to be written and verified using TypeScript's compiler.
 
