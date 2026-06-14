@@ -1,4 +1,6 @@
 import type { CompositionNode, GrammarCategory } from "../analysis/parse";
+import { lookup } from "../vocab/dictionary";
+import { useLang } from "../context/lang";
 import styles from "./CompositionTree.module.css";
 
 export const CATEGORY_META: Record<
@@ -31,6 +33,7 @@ export default function CompositionTree({
   onSelect,
   depth = 0,
 }: Props) {
+  const { lang } = useLang();
   const meta = CATEGORY_META[node.category];
   const color = `var(${meta.varName})`;
   const isLiteral = node.ctor === null && node.children.length === 0;
@@ -41,18 +44,23 @@ export default function CompositionTree({
   const showResolved =
     node.resolved != null && node.resolved !== "" && node.resolved !== literalValue;
 
+  // Look the word up in the vocabulary table to show its reading + meaning.
+  const lookupKey = node.label.replace(/^"|"$/g, "");
+  const entry = lookup(lookupKey);
+
   return (
     <div className={styles.node} style={{ ["--cat" as string]: color }}>
       <button
         type="button"
         className={`${styles.row} ${selected ? styles.selected : ""}`}
         onClick={() => onSelect(node)}
-        title={node.text}
+        title={entry ? `${entry.reading} · ${lang === "zh" ? entry.zh : entry.en}` : node.text}
       >
         <span className={styles.tag} style={{ background: color }}>
           {meta.jp}
         </span>
         <span className={`jp ${styles.label}`}>{node.label}</span>
+        {entry && <span className={`jp ${styles.reading}`}>{entry.reading}</span>}
         {node.ctor && <span className={styles.ctor}>{node.ctor}</span>}
         {showResolved && (
           <span className={`jp ${styles.resolved}`}>

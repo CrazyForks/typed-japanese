@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "肉", reading: "にく", romaji: "niku", pos: "noun", en: "meat", zh: "肉" },
+  { word: "日本", reading: "にほん", romaji: "nihon", pos: "noun", en: "Japan", zh: "日本" },
+  { word: "日本語", reading: "にほんご", romaji: "nihongo", pos: "noun", en: "Japanese language", zh: "日语" },
+  { word: "日本人", reading: "にほんじん", romaji: "nihonjin", pos: "noun", en: "Japanese person", zh: "日本人" },
+  { word: "日曜日", reading: "にちようび", romaji: "nichiyōbi", pos: "noun", en: "Sunday", zh: "星期日" },
+  { word: "入る", reading: "はいる", romaji: "hairu", pos: "verb-godan", en: "to enter", zh: "进入" },
+  { word: "入れる", reading: "いれる", romaji: "ireru", pos: "verb-ichidan", en: "to put in", zh: "放入" },
+  { word: "認める", reading: "みとめる", romaji: "mitomeru", pos: "verb-ichidan", en: "to acknowledge", zh: "承认" },
+  { word: "猫", reading: "ねこ", romaji: "neko", pos: "noun", en: "cat", zh: "猫" },
+  { word: "買う", reading: "かう", romaji: "kau", pos: "verb-godan", en: "to buy", zh: "买" },
+  { word: "白い", reading: "しろい", romaji: "shiroi", pos: "i-adjective", en: "white", zh: "白色的" },
+  { word: "判断", reading: "はんだん", romaji: "handan", pos: "noun", en: "judgment", zh: "判断" },
+  { word: "犯人", reading: "はんにん", romaji: "hannin", pos: "noun", en: "culprit", zh: "犯人" },
+  { word: "彼", reading: "かれ", romaji: "kare", pos: "noun", en: "he", zh: "他" },
+  { word: "彼女", reading: "かのじょ", romaji: "kanojo", pos: "noun", en: "she", zh: "她" },
+  { word: "美しい", reading: "うつくしい", romaji: "utsukushii", pos: "i-adjective", en: "beautiful", zh: "美丽的" },
+  { word: "病院", reading: "びょういん", romaji: "byōin", pos: "noun", en: "hospital", zh: "医院" },
+  { word: "病気", reading: "びょうき", romaji: "byōki", pos: "noun", en: "illness", zh: "疾病" },
+  { word: "貧乏", reading: "びんぼう", romaji: "binbō", pos: "noun", en: "poverty", zh: "贫穷" },
+  { word: "不便", reading: "ふべん", romaji: "fuben", pos: "na-adjective", en: "inconvenient", zh: "不方便" },
+  { word: "富士山", reading: "ふじさん", romaji: "fujisan", pos: "noun", en: "Mount Fuji", zh: "富士山" },
+  { word: "父", reading: "ちち", romaji: "chichi", pos: "noun", en: "father", zh: "父亲" },
+  { word: "部屋", reading: "へや", romaji: "heya", pos: "noun", en: "room", zh: "房间" },
+  { word: "部長", reading: "ぶちょう", romaji: "buchō", pos: "noun", en: "department manager", zh: "部长" },
+  { word: "分かる", reading: "わかる", romaji: "wakaru", pos: "verb-godan", en: "to understand", zh: "明白" },
+  { word: "文化", reading: "ぶんか", romaji: "bunka", pos: "noun", en: "culture", zh: "文化" },
+  { word: "聞く", reading: "きく", romaji: "kiku", pos: "verb-godan", en: "to listen, to ask", zh: "听，问" },
+  { word: "閉まる", reading: "しまる", romaji: "shimaru", pos: "verb-godan", en: "to close (intransitive)", zh: "关闭" },
+  { word: "閉める", reading: "しめる", romaji: "shimeru", pos: "verb-ichidan", en: "to close (transitive)", zh: "关上" },
+  { word: "便利", reading: "べんり", romaji: "benri", pos: "noun", en: "convenient", zh: "方便" },
+];
+
+export default entries;

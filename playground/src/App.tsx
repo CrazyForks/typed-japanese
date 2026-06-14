@@ -1,10 +1,11 @@
 import { useState } from "react";
 import Tutorial from "./components/Tutorial";
 import Playground from "./components/Playground";
+import Glossary from "./components/Glossary";
 import { useLang } from "./context/lang";
 import styles from "./App.module.css";
 
-type Tab = "tutorial" | "playground";
+type Tab = "tutorial" | "glossary" | "playground";
 
 export default function App() {
   const { lang, setLang, t } = useLang();
@@ -60,6 +61,12 @@ export default function App() {
           📖 {t("Grammar Course", "语法教程")}
         </button>
         <button
+          className={`${styles.tab} ${tab === "glossary" ? styles.tabActive : ""}`}
+          onClick={() => setTab("glossary")}
+        >
+          📚 {t("Glossary", "词汇表")}
+        </button>
+        <button
           className={`${styles.tab} ${tab === "playground" ? styles.tabActive : ""}`}
           onClick={() => setTab("playground")}
         >
@@ -68,7 +75,9 @@ export default function App() {
       </nav>
 
       <main className={styles.main}>
-        {tab === "tutorial" ? <Tutorial /> : <Playground />}
+        {tab === "tutorial" && <Tutorial />}
+        {tab === "glossary" && <Glossary />}
+        {tab === "playground" && <Playground />}
       </main>
 
       <footer className={styles.footer}>

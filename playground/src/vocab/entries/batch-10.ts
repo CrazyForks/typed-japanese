@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "歩く", reading: "あるく", romaji: "aruku", pos: "verb-godan", en: "to walk", zh: "走，步行" },
+  { word: "母", reading: "はは", romaji: "haha", pos: "noun", en: "mother", zh: "母亲" },
+  { word: "忘れる", reading: "わすれる", romaji: "wasureru", pos: "verb-ichidan", en: "to forget", zh: "忘记" },
+  { word: "忙しい", reading: "いそがしい", romaji: "isogashii", pos: "i-adjective", en: "busy", zh: "忙碌的" },
+  { word: "本", reading: "ほん", romaji: "hon", pos: "noun", en: "book", zh: "书" },
+  { word: "本当のこと", reading: "ほんとうのこと", romaji: "hontō no koto", pos: "noun", en: "the truth", zh: "真实的事情" },
+  { word: "眠い", reading: "ねむい", romaji: "nemui", pos: "i-adjective", en: "sleepy", zh: "困的，想睡的" },
+  { word: "夢", reading: "ゆめ", romaji: "yume", pos: "noun", en: "dream", zh: "梦，梦想" },
+  { word: "名前", reading: "なまえ", romaji: "namae", pos: "noun", en: "name", zh: "名字" },
+  { word: "明日", reading: "あした", romaji: "ashita", pos: "noun", en: "tomorrow", zh: "明天" },
+  { word: "面白い", reading: "おもしろい", romaji: "omoshiroi", pos: "i-adjective", en: "interesting", zh: "有趣的" },
+  { word: "問題", reading: "もんだい", romaji: "mondai", pos: "noun", en: "problem; question", zh: "问题" },
+  { word: "野菜", reading: "やさい", romaji: "yasai", pos: "noun", en: "vegetable", zh: "蔬菜" },
+  { word: "薬", reading: "くすり", romaji: "kusuri", pos: "noun", en: "medicine", zh: "药" },
+  { word: "優しい", reading: "やさしい", romaji: "yasashii", pos: "i-adjective", en: "kind; gentle", zh: "温柔的，亲切的" },
+  { word: "友達", reading: "ともだち", romaji: "tomodachi", pos: "noun", en: "friend", zh: "朋友" },
+  { word: "有名", reading: "ゆうめい", romaji: "yūmei", pos: "noun", en: "famous", zh: "有名" },
+  { word: "遊ぶ", reading: "あそぶ", romaji: "asobu", pos: "verb-godan", en: "to play", zh: "玩耍" },
+  { word: "予算", reading: "よさん", romaji: "yosan", pos: "noun", en: "budget", zh: "预算" },
+  { word: "予約", reading: "よやく", romaji: "yoyaku", pos: "noun", en: "reservation", zh: "预约" },
+  { word: "来る", reading: "くる", romaji: "kuru", pos: "verb-irregular", en: "to come", zh: "来" },
+  { word: "来週", reading: "らいしゅう", romaji: "raishū", pos: "noun", en: "next week", zh: "下周" },
+  { word: "来店", reading: "らいてん", romaji: "raiten", pos: "noun", en: "visiting a store", zh: "光临（到店）" },
+  { word: "履く", reading: "はく", romaji: "haku", pos: "verb-godan", en: "to put on (footwear)", zh: "穿（鞋袜）" },
+  { word: "留学", reading: "りゅうがく", romaji: "ryūgaku", pos: "noun", en: "studying abroad", zh: "留学" },
+  { word: "旅行", reading: "りょこう", romaji: "ryokō", pos: "noun", en: "travel; trip", zh: "旅行" },
+  { word: "料理", reading: "りょうり", romaji: "ryōri", pos: "noun", en: "cooking; cuisine", zh: "料理，菜肴" },
+  { word: "連絡", reading: "れんらく", romaji: "renraku", pos: "noun", en: "contact; communication", zh: "联系" },
+  { word: "話", reading: "はなし", romaji: "hanashi", pos: "noun", en: "story; talk", zh: "话，故事" },
+  { word: "話す", reading: "はなす", romaji: "hanasu", pos: "verb-godan", en: "to speak; to talk", zh: "说，谈" },
+];
+
+export default entries;

@@ -1,0 +1,120 @@
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.15;
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.chip:hover {
+  border-color: var(--sakura-400);
+  background: var(--surface-2);
+}
+
+.chipPlain {
+  color: var(--ink-500);
+}
+
+.inline {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  border-bottom: 1px dotted var(--border-strong);
+}
+
+.inline:hover {
+  color: var(--sakura-600);
+  border-color: var(--sakura-400);
+}
+
+.word {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.reading {
+  font-size: 0.68rem;
+  color: var(--ink-500);
+}
+
+/* popover */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.popover {
+  position: fixed;
+  z-index: 61;
+  min-width: 200px;
+  max-width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 12px 14px;
+}
+
+.popHead {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.popWord {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--ink-900);
+}
+
+.popReading {
+  font-size: 0.95rem;
+  color: var(--sakura-600);
+  font-weight: 700;
+}
+
+.popMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.romaji {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--ink-500);
+}
+
+.posTag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--sakura-600);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.meaning {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-900);
+}
+
+.meaningAlt {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-500);
+}

@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "映画", reading: "えいが", romaji: "eiga", pos: "noun", en: "movie", zh: "电影" },
+  { word: "泳ぐ", reading: "およぐ", romaji: "oyogu", pos: "verb-godan", en: "to swim", zh: "游泳" },
+  { word: "英語", reading: "えいご", romaji: "eigo", pos: "noun", en: "English (language)", zh: "英语" },
+  { word: "駅", reading: "えき", romaji: "eki", pos: "noun", en: "station", zh: "车站" },
+  { word: "押す", reading: "おす", romaji: "osu", pos: "verb-godan", en: "to push", zh: "推；按" },
+  { word: "家", reading: "いえ", romaji: "ie", pos: "noun", en: "house, home", zh: "家；房子" },
+  { word: "暇", reading: "ひま", romaji: "hima", pos: "na-adjective", en: "free (time), idle", zh: "空闲的" },
+  { word: "果物", reading: "くだもの", romaji: "kudamono", pos: "noun", en: "fruit", zh: "水果" },
+  { word: "歌", reading: "うた", romaji: "uta", pos: "noun", en: "song", zh: "歌" },
+  { word: "歌う", reading: "うたう", romaji: "utau", pos: "verb-godan", en: "to sing", zh: "唱歌" },
+  { word: "花", reading: "はな", romaji: "hana", pos: "noun", en: "flower", zh: "花" },
+  { word: "過ぎる", reading: "すぎる", romaji: "sugiru", pos: "verb-ichidan", en: "to pass, to exceed", zh: "经过；超过" },
+  { word: "我々", reading: "われわれ", romaji: "wareware", pos: "noun", en: "we, us", zh: "我们" },
+  { word: "我慢", reading: "がまん", romaji: "gaman", pos: "noun", en: "patience, endurance", zh: "忍耐" },
+  { word: "会う", reading: "あう", romaji: "au", pos: "verb-godan", en: "to meet", zh: "见面" },
+  { word: "会議", reading: "かいぎ", romaji: "kaigi", pos: "noun", en: "meeting, conference", zh: "会议" },
+  { word: "海外", reading: "かいがい", romaji: "kaigai", pos: "noun", en: "overseas, abroad", zh: "海外" },
+  { word: "開く", reading: "ひらく", romaji: "hiraku", pos: "verb-godan", en: "to open", zh: "打开；开" },
+  { word: "開ける", reading: "あける", romaji: "akeru", pos: "verb-ichidan", en: "to open (something)", zh: "打开" },
+  { word: "開会", reading: "かいかい", romaji: "kaikai", pos: "noun", en: "opening of a meeting", zh: "开会" },
+  { word: "外", reading: "そと", romaji: "soto", pos: "noun", en: "outside", zh: "外面" },
+  { word: "確認", reading: "かくにん", romaji: "kakunin", pos: "noun", en: "confirmation, verification", zh: "确认" },
+  { word: "学校", reading: "がっこう", romaji: "gakkō", pos: "noun", en: "school", zh: "学校" },
+  { word: "学生", reading: "がくせい", romaji: "gakusei", pos: "noun", en: "student", zh: "学生" },
+  { word: "楽しい", reading: "たのしい", romaji: "tanoshii", pos: "i-adjective", en: "fun, enjoyable", zh: "快乐的；愉快的" },
+  { word: "噛む", reading: "かむ", romaji: "kamu", pos: "verb-godan", en: "to bite, to chew", zh: "咬；咀嚼" },
+  { word: "寒い", reading: "さむい", romaji: "samui", pos: "i-adjective", en: "cold (weather)", zh: "寒冷的" },
+  { word: "感動", reading: "かんどう", romaji: "kandō", pos: "noun", en: "being moved, deep emotion", zh: "感动" },
+  { word: "漢字", reading: "かんじ", romaji: "kanji", pos: "noun", en: "kanji, Chinese characters", zh: "汉字" },
+  { word: "間に合う", reading: "まにあう", romaji: "maniau", pos: "verb-godan", en: "to be in time", zh: "来得及；赶上" },
+];
+
+export default entries;

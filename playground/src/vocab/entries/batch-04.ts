@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "眼鏡", reading: "めがね", romaji: "megane", pos: "noun", en: "glasses, eyeglasses", zh: "眼镜" },
+  { word: "机の上", reading: "つくえのうえ", romaji: "tsukue no ue", pos: "noun", en: "on the desk", zh: "桌子上" },
+  { word: "帰る", reading: "かえる", romaji: "kaeru", pos: "verb-godan", en: "to return, to go home", zh: "回去，回家" },
+  { word: "気分", reading: "きぶん", romaji: "kibun", pos: "noun", en: "feeling, mood", zh: "心情，情绪" },
+  { word: "規則", reading: "きそく", romaji: "kisoku", pos: "noun", en: "rule, regulation", zh: "规则" },
+  { word: "起きる", reading: "おきる", romaji: "okiru", pos: "verb-ichidan", en: "to get up, to wake up", zh: "起床，发生" },
+  { word: "疑う", reading: "うたがう", romaji: "utagau", pos: "verb-godan", en: "to doubt, to suspect", zh: "怀疑" },
+  { word: "議論", reading: "ぎろん", romaji: "giron", pos: "noun", en: "discussion, argument", zh: "讨论，争论" },
+  { word: "休む", reading: "やすむ", romaji: "yasumu", pos: "verb-godan", en: "to rest, to take a day off", zh: "休息，请假" },
+  { word: "吸う", reading: "すう", romaji: "suu", pos: "verb-godan", en: "to inhale, to smoke", zh: "吸，抽（烟）" },
+  { word: "急ぐ", reading: "いそぐ", romaji: "isogu", pos: "verb-godan", en: "to hurry", zh: "急，赶紧" },
+  { word: "泣く", reading: "なく", romaji: "naku", pos: "verb-godan", en: "to cry", zh: "哭" },
+  { word: "教える", reading: "おしえる", romaji: "oshieru", pos: "verb-ichidan", en: "to teach, to tell", zh: "教，告诉" },
+  { word: "教室", reading: "きょうしつ", romaji: "kyōshitsu", pos: "noun", en: "classroom", zh: "教室" },
+  { word: "曲がる", reading: "まがる", romaji: "magaru", pos: "verb-godan", en: "to turn, to bend", zh: "转弯，弯曲" },
+  { word: "銀行", reading: "ぎんこう", romaji: "ginkō", pos: "noun", en: "bank", zh: "银行" },
+  { word: "兄", reading: "あに", romaji: "ani", pos: "noun", en: "older brother", zh: "哥哥" },
+  { word: "契約", reading: "けいやく", romaji: "keiyaku", pos: "noun", en: "contract, agreement", zh: "合同，契约" },
+  { word: "計画", reading: "けいかく", romaji: "keikaku", pos: "noun", en: "plan", zh: "计划" },
+  { word: "決める", reading: "きめる", romaji: "kimeru", pos: "verb-ichidan", en: "to decide", zh: "决定" },
+  { word: "決意", reading: "けつい", romaji: "ketsui", pos: "noun", en: "determination, resolve", zh: "决心，决意" },
+  { word: "結果", reading: "けっか", romaji: "kekka", pos: "noun", en: "result, outcome", zh: "结果" },
+  { word: "犬", reading: "いぬ", romaji: "inu", pos: "noun", en: "dog", zh: "狗" },
+  { word: "見せる", reading: "みせる", romaji: "miseru", pos: "verb-ichidan", en: "to show", zh: "给…看，出示" },
+  { word: "見る", reading: "みる", romaji: "miru", pos: "verb-ichidan", en: "to see, to watch", zh: "看" },
+  { word: "元気", reading: "げんき", romaji: "genki", pos: "na-adjective", en: "healthy, energetic", zh: "健康，精神好" },
+  { word: "厳しい", reading: "きびしい", romaji: "kibishii", pos: "i-adjective", en: "strict, severe", zh: "严厉，严格" },
+  { word: "言い訳", reading: "いいわけ", romaji: "iiwake", pos: "noun", en: "excuse", zh: "借口，辩解" },
+  { word: "言う", reading: "いう", romaji: "iu", pos: "verb-godan", en: "to say", zh: "说" },
+  { word: "言語", reading: "げんご", romaji: "gengo", pos: "noun", en: "language", zh: "语言" },
+];
+
+export default entries;

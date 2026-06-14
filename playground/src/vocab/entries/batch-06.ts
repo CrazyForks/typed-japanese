@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "時間", reading: "じかん", romaji: "jikan", pos: "noun", en: "time; hour", zh: "时间" },
+  { word: "治る", reading: "なおる", romaji: "naoru", pos: "verb-godan", en: "to be cured; to heal", zh: "痊愈；治好" },
+  { word: "辞書", reading: "じしょ", romaji: "jisho", pos: "noun", en: "dictionary", zh: "词典" },
+  { word: "叱る", reading: "しかる", romaji: "shikaru", pos: "verb-godan", en: "to scold", zh: "责骂；训斥" },
+  { word: "失敗", reading: "しっぱい", romaji: "shippai", pos: "noun", en: "failure", zh: "失败" },
+  { word: "写真", reading: "しゃしん", romaji: "shashin", pos: "noun", en: "photograph", zh: "照片" },
+  { word: "社長", reading: "しゃちょう", romaji: "shachō", pos: "noun", en: "company president", zh: "社长；总经理" },
+  { word: "車", reading: "くるま", romaji: "kuruma", pos: "noun", en: "car", zh: "车；汽车" },
+  { word: "借りる", reading: "かりる", romaji: "kariru", pos: "verb-ichidan", en: "to borrow", zh: "借（入）" },
+  { word: "守る", reading: "まもる", romaji: "mamoru", pos: "verb-godan", en: "to protect; to keep", zh: "保护；遵守" },
+  { word: "手", reading: "て", romaji: "te", pos: "noun", en: "hand", zh: "手" },
+  { word: "手伝う", reading: "てつだう", romaji: "tetsudau", pos: "verb-godan", en: "to help", zh: "帮忙" },
+  { word: "受付", reading: "うけつけ", romaji: "uketsuke", pos: "noun", en: "reception", zh: "接待处；前台" },
+  { word: "寿司", reading: "すし", romaji: "sushi", pos: "noun", en: "sushi", zh: "寿司" },
+  { word: "授業", reading: "じゅぎょう", romaji: "jugyō", pos: "noun", en: "class; lesson", zh: "课；上课" },
+  { word: "終わる", reading: "おわる", romaji: "owaru", pos: "verb-godan", en: "to end; to finish", zh: "结束；完了" },
+  { word: "住む", reading: "すむ", romaji: "sumu", pos: "verb-godan", en: "to live; to reside", zh: "居住" },
+  { word: "重要", reading: "じゅうよう", romaji: "jūyō", pos: "na-adjective", en: "important", zh: "重要" },
+  { word: "出る", reading: "でる", romaji: "deru", pos: "verb-ichidan", en: "to go out; to leave", zh: "出去；出来" },
+  { word: "春", reading: "はる", romaji: "haru", pos: "noun", en: "spring", zh: "春天" },
+  { word: "暑い", reading: "あつい", romaji: "atsui", pos: "i-adjective", en: "hot (weather)", zh: "热（天气）" },
+  { word: "書く", reading: "かく", romaji: "kaku", pos: "verb-godan", en: "to write", zh: "写" },
+  { word: "書類", reading: "しょるい", romaji: "shorui", pos: "noun", en: "documents", zh: "文件；资料" },
+  { word: "消える", reading: "きえる", romaji: "kieru", pos: "verb-ichidan", en: "to disappear; to go out", zh: "消失；熄灭" },
+  { word: "消す", reading: "けす", romaji: "kesu", pos: "verb-godan", en: "to erase; to turn off", zh: "消除；关掉" },
+  { word: "笑う", reading: "わらう", romaji: "warau", pos: "verb-godan", en: "to laugh; to smile", zh: "笑" },
+  { word: "証拠", reading: "しょうこ", romaji: "shōko", pos: "noun", en: "evidence; proof", zh: "证据" },
+  { word: "上手", reading: "じょうず", romaji: "jōzu", pos: "noun", en: "skillful; good at", zh: "擅长；高明" },
+  { word: "冗談", reading: "じょうだん", romaji: "jōdan", pos: "noun", en: "joke", zh: "玩笑" },
+  { word: "食べる", reading: "たべる", romaji: "taberu", pos: "verb-ichidan", en: "to eat", zh: "吃" },
+];
+
+export default entries;

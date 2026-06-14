@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "貸す", reading: "かす", romaji: "kasu", pos: "verb-godan", en: "to lend", zh: "借出，出借" },
+  { word: "大きい", reading: "おおきい", romaji: "ōkii", pos: "i-adjective", en: "big", zh: "大的" },
+  { word: "大阪", reading: "おおさか", romaji: "Ōsaka", pos: "noun", en: "Osaka", zh: "大阪" },
+  { word: "脱ぐ", reading: "ぬぐ", romaji: "nugu", pos: "verb-godan", en: "to take off (clothes)", zh: "脱（衣服）" },
+  { word: "弾く", reading: "ひく", romaji: "hiku", pos: "verb-godan", en: "to play (an instrument)", zh: "弹奏（乐器）" },
+  { word: "暖かい", reading: "あたたかい", romaji: "atatakai", pos: "i-adjective", en: "warm", zh: "暖和的" },
+  { word: "知る", reading: "しる", romaji: "shiru", pos: "verb-godan", en: "to know", zh: "知道" },
+  { word: "遅れる", reading: "おくれる", romaji: "okureru", pos: "verb-ichidan", en: "to be late", zh: "迟到，晚点" },
+  { word: "着く", reading: "つく", romaji: "tsuku", pos: "verb-godan", en: "to arrive", zh: "到达" },
+  { word: "着る", reading: "きる", romaji: "kiru", pos: "verb-ichidan", en: "to wear", zh: "穿（衣服）" },
+  { word: "中国語", reading: "ちゅうごくご", romaji: "chūgokugo", pos: "noun", en: "Chinese (language)", zh: "汉语" },
+  { word: "中止", reading: "ちゅうし", romaji: "chūshi", pos: "noun", en: "cancellation, suspension", zh: "中止，取消" },
+  { word: "朝ご飯", reading: "あさごはん", romaji: "asagohan", pos: "noun", en: "breakfast", zh: "早饭" },
+  { word: "町", reading: "まち", romaji: "machi", pos: "noun", en: "town", zh: "城镇" },
+  { word: "弟", reading: "おとうと", romaji: "otōto", pos: "noun", en: "younger brother", zh: "弟弟" },
+  { word: "諦める", reading: "あきらめる", romaji: "akirameru", pos: "verb-ichidan", en: "to give up", zh: "放弃" },
+  { word: "天気", reading: "てんき", romaji: "tenki", pos: "noun", en: "weather", zh: "天气" },
+  { word: "店", reading: "みせ", romaji: "mise", pos: "noun", en: "shop, store", zh: "商店" },
+  { word: "田中", reading: "たなか", romaji: "Tanaka", pos: "noun", en: "Tanaka (surname)", zh: "田中（姓氏）" },
+  { word: "田中さん", reading: "たなかさん", romaji: "Tanaka-san", pos: "noun", en: "Mr./Ms. Tanaka", zh: "田中先生／女士" },
+  { word: "電気", reading: "でんき", romaji: "denki", pos: "noun", en: "electricity, light", zh: "电，电灯" },
+  { word: "電車", reading: "でんしゃ", romaji: "densha", pos: "noun", en: "train", zh: "电车" },
+  { word: "努力", reading: "どりょく", romaji: "doryoku", pos: "noun", en: "effort", zh: "努力" },
+  { word: "東京", reading: "とうきょう", romaji: "Tōkyō", pos: "noun", en: "Tokyo", zh: "东京" },
+  { word: "盗む", reading: "ぬすむ", romaji: "nusumu", pos: "verb-godan", en: "to steal", zh: "偷窃" },
+  { word: "働く", reading: "はたらく", romaji: "hataraku", pos: "verb-godan", en: "to work", zh: "工作" },
+  { word: "読む", reading: "よむ", romaji: "yomu", pos: "verb-godan", en: "to read", zh: "读，阅读" },
+  { word: "難しい", reading: "むずかしい", romaji: "muzukashii", pos: "i-adjective", en: "difficult", zh: "难的" },
+  { word: "二人", reading: "ふたり", romaji: "futari", pos: "noun", en: "two people", zh: "两个人" },
+  { word: "二枚", reading: "にまい", romaji: "nimai", pos: "noun", en: "two (flat objects)", zh: "两张（薄平物）" },
+];
+
+export default entries;

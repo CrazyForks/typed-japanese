@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "寝る", reading: "ねる", romaji: "neru", pos: "verb-ichidan", en: "to sleep; to go to bed", zh: "睡觉" },
+  { word: "心配", reading: "しんぱい", romaji: "shinpai", pos: "noun", en: "worry; anxiety", zh: "担心；忧虑" },
+  { word: "新しい", reading: "あたらしい", romaji: "atarashii", pos: "i-adjective", en: "new", zh: "新的" },
+  { word: "新年", reading: "しんねん", romaji: "shinnen", pos: "noun", en: "new year", zh: "新年" },
+  { word: "新聞", reading: "しんぶん", romaji: "shinbun", pos: "noun", en: "newspaper", zh: "报纸" },
+  { word: "申す", reading: "もうす", romaji: "mōsu", pos: "verb-godan", en: "to say (humble)", zh: "说（谦语）" },
+  { word: "真実", reading: "しんじつ", romaji: "shinjitsu", pos: "noun", en: "truth", zh: "真实；事实" },
+  { word: "人", reading: "ひと", romaji: "hito", pos: "noun", en: "person", zh: "人" },
+  { word: "図書館", reading: "としょかん", romaji: "toshokan", pos: "noun", en: "library", zh: "图书馆" },
+  { word: "水", reading: "みず", romaji: "mizu", pos: "noun", en: "water", zh: "水" },
+  { word: "成功", reading: "せいこう", romaji: "seikō", pos: "noun", en: "success", zh: "成功" },
+  { word: "正しい", reading: "ただしい", romaji: "tadashii", pos: "i-adjective", en: "correct; right", zh: "正确的" },
+  { word: "声", reading: "こえ", romaji: "koe", pos: "noun", en: "voice", zh: "声音" },
+  { word: "静か", reading: "しずか", romaji: "shizuka", pos: "na-adjective", en: "quiet", zh: "安静的" },
+  { word: "昔", reading: "むかし", romaji: "mukashi", pos: "noun", en: "old times; the past", zh: "从前；过去" },
+  { word: "赤い", reading: "あかい", romaji: "akai", pos: "i-adjective", en: "red", zh: "红色的" },
+  { word: "赤ちゃん", reading: "あかちゃん", romaji: "akachan", pos: "noun", en: "baby", zh: "婴儿" },
+  { word: "切符", reading: "きっぷ", romaji: "kippu", pos: "noun", en: "ticket", zh: "票" },
+  { word: "説明", reading: "せつめい", romaji: "setsumei", pos: "noun", en: "explanation", zh: "说明；解释" },
+  { word: "先生", reading: "せんせい", romaji: "sensei", pos: "noun", en: "teacher", zh: "老师" },
+  { word: "千円", reading: "せんえん", romaji: "sen'en", pos: "noun", en: "one thousand yen", zh: "一千日元" },
+  { word: "洗う", reading: "あらう", romaji: "arau", pos: "verb-godan", en: "to wash", zh: "洗" },
+  { word: "素晴らしい", reading: "すばらしい", romaji: "subarashii", pos: "i-adjective", en: "wonderful; splendid", zh: "极好的；了不起的" },
+  { word: "窓", reading: "まど", romaji: "mado", pos: "noun", en: "window", zh: "窗户" },
+  { word: "送る", reading: "おくる", romaji: "okuru", pos: "verb-godan", en: "to send", zh: "送；寄" },
+  { word: "速い", reading: "はやい", romaji: "hayai", pos: "i-adjective", en: "fast; quick", zh: "快的" },
+  { word: "続く", reading: "つづく", romaji: "tsuzuku", pos: "verb-godan", en: "to continue", zh: "持续；继续" },
+  { word: "卒業", reading: "そつぎょう", romaji: "sotsugyō", pos: "noun", en: "graduation", zh: "毕业" },
+  { word: "対立", reading: "たいりつ", romaji: "tairitsu", pos: "noun", en: "confrontation; opposition", zh: "对立；冲突" },
+  { word: "待つ", reading: "まつ", romaji: "matsu", pos: "verb-godan", en: "to wait", zh: "等待" },
+];
+
+export default entries;

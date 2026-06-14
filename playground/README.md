@@ -12,6 +12,12 @@ library, with two parts:
   analyzer and see its grammatical structure. All 380+ snippets are verified to
   type-check **and** resolve to exactly the sentence shown
   (`pnpm verify:snippets`).
+- **📚 Glossary** — a searchable vocabulary table (`src/vocab`) of every word
+  the course uses: kanji, kana reading, romaji, part of speech, and bilingual
+  meaning. In the course, each example shows its words as clickable chips —
+  click any word to see how it's read and what it means; the structure tree
+  shows furigana inline too. A compiler check (`pnpm verify:vocab`) guarantees
+  **every** word used in the course is indexed in the table.
 - **🧪 Playground** — write a Japanese sentence as a TypeScript type and watch
   how it's composed, node by node.
 

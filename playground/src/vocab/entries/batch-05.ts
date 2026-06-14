@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "午後3時", reading: "ごごさんじ", romaji: "gogo sanji", pos: "noun", en: "3 p.m.", zh: "下午三点" },
+  { word: "公園", reading: "こうえん", romaji: "kōen", pos: "noun", en: "park", zh: "公园" },
+  { word: "好き", reading: "すき", romaji: "suki", pos: "na-adjective", en: "liked, favorite", zh: "喜欢" },
+  { word: "幸せ", reading: "しあわせ", romaji: "shiawase", pos: "na-adjective", en: "happy", zh: "幸福" },
+  { word: "考える", reading: "かんがえる", romaji: "kangaeru", pos: "verb-ichidan", en: "to think, to consider", zh: "思考" },
+  { word: "行く", reading: "いく", romaji: "iku", pos: "verb-godan", en: "to go", zh: "去" },
+  { word: "行動", reading: "こうどう", romaji: "kōdō", pos: "noun", en: "action, conduct", zh: "行动" },
+  { word: "降る", reading: "ふる", romaji: "furu", pos: "verb-godan", en: "to fall (rain, snow)", zh: "下（雨、雪）" },
+  { word: "高い", reading: "たかい", romaji: "takai", pos: "i-adjective", en: "high, expensive", zh: "高、贵" },
+  { word: "国内", reading: "こくない", romaji: "kokunai", pos: "noun", en: "domestic, within the country", zh: "国内" },
+  { word: "今", reading: "いま", romaji: "ima", pos: "noun", en: "now", zh: "现在" },
+  { word: "今日", reading: "きょう", romaji: "kyō", pos: "noun", en: "today", zh: "今天" },
+  { word: "財布", reading: "さいふ", romaji: "saifu", pos: "noun", en: "wallet", zh: "钱包" },
+  { word: "咲く", reading: "さく", romaji: "saku", pos: "verb-godan", en: "to bloom", zh: "开花" },
+  { word: "昨日", reading: "きのう", romaji: "kinō", pos: "noun", en: "yesterday", zh: "昨天" },
+  { word: "撮る", reading: "とる", romaji: "toru", pos: "verb-godan", en: "to take (a photo)", zh: "拍摄" },
+  { word: "三つ", reading: "みっつ", romaji: "mittsu", pos: "noun", en: "three (things)", zh: "三个" },
+  { word: "傘", reading: "かさ", romaji: "kasa", pos: "noun", en: "umbrella", zh: "伞" },
+  { word: "参る", reading: "まいる", romaji: "mairu", pos: "verb-godan", en: "to go, to come (humble)", zh: "去、来（自谦语）" },
+  { word: "山", reading: "やま", romaji: "yama", pos: "noun", en: "mountain", zh: "山" },
+  { word: "仕事", reading: "しごと", romaji: "shigoto", pos: "noun", en: "work, job", zh: "工作" },
+  { word: "使う", reading: "つかう", romaji: "tsukau", pos: "verb-godan", en: "to use", zh: "使用" },
+  { word: "刺身", reading: "さしみ", romaji: "sashimi", pos: "noun", en: "sashimi", zh: "生鱼片" },
+  { word: "姉", reading: "あね", romaji: "ane", pos: "noun", en: "older sister", zh: "姐姐" },
+  { word: "子供", reading: "こども", romaji: "kodomo", pos: "noun", en: "child", zh: "孩子" },
+  { word: "子供の頃", reading: "こどものころ", romaji: "kodomo no koro", pos: "noun", en: "childhood", zh: "小时候" },
+  { word: "私", reading: "わたし", romaji: "watashi", pos: "noun", en: "I, me", zh: "我" },
+  { word: "私の趣味", reading: "わたしのしゅみ", romaji: "watashi no shumi", pos: "noun", en: "my hobby", zh: "我的爱好" },
+  { word: "資料", reading: "しりょう", romaji: "shiryō", pos: "noun", en: "materials, documents", zh: "资料" },
+  { word: "持つ", reading: "もつ", romaji: "motsu", pos: "verb-godan", en: "to hold, to have", zh: "拿、持有" },
+];
+
+export default entries;

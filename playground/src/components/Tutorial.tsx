@@ -3,7 +3,9 @@ import { CHAPTERS } from "../tutorial/chapters";
 import { LEVEL_META } from "../tutorial/levels";
 import type { Chapter, Example, Level } from "../tutorial/types";
 import { useLang } from "../context/lang";
+import { extractWords } from "../vocab/extract";
 import Analyzer from "./Analyzer";
+import VocabWord from "./VocabWord";
 import styles from "./Tutorial.module.css";
 
 const LEVELS: Level[] = ["elementary", "intermediate", "advanced"];
@@ -146,6 +148,12 @@ export default function Tutorial() {
                       >
                         🔬 {t("Analyze", "解析")}
                       </button>
+                      <div className={styles.vocabRow}>
+                        <span className={styles.vocabLabel}>{t("Words", "词汇")}</span>
+                        {extractWords(ex.code).map((w, k) => (
+                          <VocabWord key={k} word={w.word} />
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

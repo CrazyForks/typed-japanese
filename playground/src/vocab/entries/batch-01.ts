@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "1500円", reading: "せんごひゃくえん", romaji: "sengohyakuen", pos: "noun", en: "1500 yen", zh: "1500日元" },
+  { word: "300円", reading: "さんびゃくえん", romaji: "sanbyakuen", pos: "noun", en: "300 yen", zh: "300日元" },
+  { word: "5時", reading: "ごじ", romaji: "goji", pos: "noun", en: "5 o'clock", zh: "5点" },
+  { word: "7時", reading: "しちじ", romaji: "shichiji", pos: "noun", en: "7 o'clock", zh: "7点" },
+  { word: "7時30分", reading: "しちじさんじゅっぷん", romaji: "shichiji sanjuppun", pos: "noun", en: "7:30", zh: "7点30分" },
+  { word: "9時", reading: "くじ", romaji: "kuji", pos: "noun", en: "9 o'clock", zh: "9点" },
+  { word: "あきらめる", reading: "あきらめる", romaji: "akirameru", pos: "verb-ichidan", en: "to give up", zh: "放弃" },
+  { word: "あなた", reading: "あなた", romaji: "anata", pos: "noun", en: "you", zh: "你" },
+  { word: "あの店", reading: "あのみせ", romaji: "ano mise", pos: "noun", en: "that shop", zh: "那家店" },
+  { word: "ある", reading: "ある", romaji: "aru", pos: "verb-godan", en: "to be (inanimate); to exist", zh: "有；在（无生命）" },
+  { word: "いい", reading: "いい", romaji: "ii", pos: "i-adjective", en: "good", zh: "好" },
+  { word: "いたす", reading: "いたす", romaji: "itasu", pos: "verb-godan", en: "to do (humble)", zh: "做（自谦语）" },
+  { word: "いる", reading: "いる", romaji: "iru", pos: "verb-ichidan", en: "to be (animate); to exist", zh: "有；在（有生命）" },
+  { word: "おいしい", reading: "おいしい", romaji: "oishii", pos: "i-adjective", en: "delicious", zh: "好吃" },
+  { word: "おっしゃいました", reading: "おっしゃいました", romaji: "osshaimashita", pos: "noun", en: "said (honorific, past)", zh: "说了（敬语）" },
+  { word: "おもしろい", reading: "おもしろい", romaji: "omoshiroi", pos: "i-adjective", en: "interesting", zh: "有趣" },
+  { word: "お願い", reading: "おねがい", romaji: "onegai", pos: "noun", en: "request; please", zh: "请求；拜托" },
+  { word: "お金", reading: "おかね", romaji: "okane", pos: "noun", en: "money", zh: "钱" },
+  { word: "お金持ち", reading: "おかねもち", romaji: "okanemochi", pos: "noun", en: "rich person", zh: "有钱人" },
+  { word: "お酒", reading: "おさけ", romaji: "osake", pos: "noun", en: "alcohol; sake", zh: "酒" },
+  { word: "お世話", reading: "おせわ", romaji: "osewa", pos: "noun", en: "care; help; assistance", zh: "照顾；关照" },
+  { word: "お茶", reading: "おちゃ", romaji: "ocha", pos: "noun", en: "tea", zh: "茶" },
+  { word: "お湯", reading: "おゆ", romaji: "oyu", pos: "noun", en: "hot water", zh: "热水" },
+  { word: "かける", reading: "かける", romaji: "kakeru", pos: "verb-ichidan", en: "to hang; to make (a call)", zh: "挂；打（电话）" },
+  { word: "かばん", reading: "かばん", romaji: "kaban", pos: "noun", en: "bag", zh: "包" },
+  { word: "きれい", reading: "きれい", romaji: "kirei", pos: "na-adjective", en: "pretty; clean", zh: "漂亮；干净" },
+  { word: "クラス", reading: "クラス", romaji: "kurasu", pos: "noun", en: "class", zh: "班级" },
+  { word: "コート", reading: "コート", romaji: "kōto", pos: "noun", en: "coat", zh: "外套" },
+  { word: "コーヒー", reading: "コーヒー", romaji: "kōhī", pos: "noun", en: "coffee", zh: "咖啡" },
+  { word: "こちら", reading: "こちら", romaji: "kochira", pos: "noun", en: "this way; this person", zh: "这边；这位" },
+];
+
+export default entries;

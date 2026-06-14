@@ -1,0 +1,36 @@
+import type { VocabEntry } from "../types";
+
+const entries: VocabEntry[] = [
+  { word: "このケーキ", reading: "このケーキ", romaji: "kono kēki", pos: "noun", en: "this cake", zh: "这个蛋糕" },
+  { word: "この町", reading: "このまち", romaji: "kono machi", pos: "noun", en: "this town", zh: "这个城镇" },
+  { word: "この店", reading: "このみせ", romaji: "kono mise", pos: "noun", en: "this shop", zh: "这家店" },
+  { word: "この本", reading: "このほん", romaji: "kono hon", pos: "noun", en: "this book", zh: "这本书" },
+  { word: "ご飯", reading: "ごはん", romaji: "gohan", pos: "noun", en: "cooked rice; meal", zh: "米饭；饭" },
+  { word: "すぐ", reading: "すぐ", romaji: "sugu", pos: "noun", en: "immediately; soon", zh: "马上；立刻" },
+  { word: "する", reading: "する", romaji: "suru", pos: "verb-irregular", en: "to do", zh: "做" },
+  { word: "そんなこと", reading: "そんなこと", romaji: "sonna koto", pos: "noun", en: "such a thing", zh: "那样的事" },
+  { word: "つける", reading: "つける", romaji: "tsukeru", pos: "verb-ichidan", en: "to turn on; to attach", zh: "打开；安装" },
+  { word: "できる", reading: "できる", romaji: "dekiru", pos: "verb-ichidan", en: "to be able to; can do", zh: "能够；会" },
+  { word: "テレビ", reading: "テレビ", romaji: "terebi", pos: "noun", en: "television", zh: "电视" },
+  { word: "ドア", reading: "ドア", romaji: "doa", pos: "noun", en: "door", zh: "门" },
+  { word: "なる", reading: "なる", romaji: "naru", pos: "verb-godan", en: "to become", zh: "成为；变成" },
+  { word: "バス", reading: "バス", romaji: "basu", pos: "noun", en: "bus", zh: "公交车" },
+  { word: "ピアノ", reading: "ピアノ", romaji: "piano", pos: "noun", en: "piano", zh: "钢琴" },
+  { word: "ボタン", reading: "ボタン", romaji: "botan", pos: "noun", en: "button", zh: "按钮；纽扣" },
+  { word: "ほめる", reading: "ほめる", romaji: "homeru", pos: "verb-ichidan", en: "to praise", zh: "表扬；称赞" },
+  { word: "みんな", reading: "みんな", romaji: "minna", pos: "noun", en: "everyone; all", zh: "大家；全部" },
+  { word: "りんご", reading: "りんご", romaji: "ringo", pos: "noun", en: "apple", zh: "苹果" },
+  { word: "レストラン", reading: "レストラン", romaji: "resutoran", pos: "noun", en: "restaurant", zh: "餐厅" },
+  { word: "わかる", reading: "わかる", romaji: "wakaru", pos: "verb-godan", en: "to understand", zh: "明白；懂" },
+  { word: "わさび", reading: "わさび", romaji: "wasabi", pos: "noun", en: "wasabi", zh: "芥末" },
+  { word: "挨拶", reading: "あいさつ", romaji: "aisatsu", pos: "noun", en: "greeting", zh: "问候；打招呼" },
+  { word: "安い", reading: "やすい", romaji: "yasui", pos: "i-adjective", en: "cheap; inexpensive", zh: "便宜" },
+  { word: "医者", reading: "いしゃ", romaji: "isha", pos: "noun", en: "doctor", zh: "医生" },
+  { word: "一週間", reading: "いっしゅうかん", romaji: "isshūkan", pos: "noun", en: "one week", zh: "一周" },
+  { word: "飲む", reading: "のむ", romaji: "nomu", pos: "verb-godan", en: "to drink", zh: "喝" },
+  { word: "右", reading: "みぎ", romaji: "migi", pos: "noun", en: "right (direction)", zh: "右；右边" },
+  { word: "雨", reading: "あめ", romaji: "ame", pos: "noun", en: "rain", zh: "雨" },
+  { word: "営業中", reading: "えいぎょうちゅう", romaji: "eigyōchū", pos: "noun", en: "open (for business)", zh: "营业中" },
+];
+
+export default entries;
