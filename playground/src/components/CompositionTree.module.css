@@ -1,0 +1,85 @@
+.node {
+  position: relative;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  margin: 3px 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cat);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition: background 0.12s, box-shadow 0.12s, transform 0.12s;
+}
+
+.row:hover {
+  background: var(--surface-2);
+}
+
+.selected {
+  background: var(--surface-2);
+  box-shadow: 0 0 0 2px var(--cat) inset, var(--shadow-sm);
+}
+
+.tag {
+  flex: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-family: var(--font-jp);
+}
+
+.label {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+
+.ctor {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-500);
+  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.resolved {
+  margin-left: auto;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--cat-phrase);
+  white-space: nowrap;
+}
+
+.arrow {
+  margin-right: 3px;
+  color: var(--ink-300);
+  font-weight: 400;
+}
+
+/* Indent children with a guide line that matches the parent's category color. */
+.children {
+  margin-left: 16px;
+  padding-left: 12px;
+  border-left: 2px dashed var(--border-strong);
+}
+
+@media (max-width: 720px) {
+  .resolved {
+    margin-left: 0;
+  }
+  .row {
+    flex-wrap: wrap;
+  }
+}

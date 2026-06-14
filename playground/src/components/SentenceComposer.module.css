@@ -1,0 +1,193 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.snippetBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.chipActive {
+  background: var(--sakura-500);
+  color: #fff;
+  border-color: var(--sakura-500);
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+  min-height: 520px;
+}
+
+.editorPane,
+.treePane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.paneHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor {
+  flex: 1;
+  min-height: 360px;
+}
+
+.loading {
+  padding: 20px;
+  color: var(--ink-500);
+  font-size: 0.9rem;
+}
+
+.badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.ok {
+  color: var(--ok);
+  background: #e8f7f0;
+}
+
+.err {
+  color: var(--err);
+  background: #fdeaed;
+}
+
+.diagList {
+  list-style: none;
+  margin: 0;
+  padding: 8px 12px;
+  max-height: 130px;
+  overflow: auto;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.diag {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ink-700);
+  padding: 2px 0;
+}
+
+.diagErr {
+  color: var(--err);
+}
+
+.diagLine {
+  flex: none;
+  opacity: 0.7;
+}
+
+/* ---- composition pane ---- */
+
+.aliasSelect {
+  width: auto;
+  max-width: 230px;
+  padding: 5px 10px;
+  font-family: var(--font-jp);
+  font-size: 0.86rem;
+}
+
+.sentenceHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px 8px;
+}
+
+.sentence {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--sakura-600);
+  line-height: 1.25;
+}
+
+.gloss {
+  font-size: 0.84rem;
+  color: var(--ink-500);
+}
+
+.treeScroll {
+  flex: 1;
+  overflow: auto;
+  padding: 4px 14px 14px;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.detailCode {
+  font-size: 0.78rem;
+  max-width: 100%;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.detailVal {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--sakura-600);
+  margin-left: auto;
+}
+
+.hint {
+  text-align: center;
+  margin: 0;
+}
+
+/* Monaco inline highlight for the node→source link */
+:global(.monaco-editor) .hl {
+  background: var(--sakura-200);
+  border-radius: 2px;
+}
+
+.hlLine {
+  background: var(--sakura-100);
+}
+
+@media (max-width: 880px) {
+  .panes {
+    grid-template-columns: 1fr;
+  }
+  .editor {
+    min-height: 300px;
+  }
+}
