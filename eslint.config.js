@@ -4,7 +4,9 @@ import js from '@eslint/js';
 
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**']
+    // playground/ is a standalone Vite app with its own tsconfig and typecheck;
+    // it is not part of this package's lint/compile project.
+    ignores: ['node_modules/**', 'dist/**', 'playground/**']
   },
   js.configs.recommended,
   {
