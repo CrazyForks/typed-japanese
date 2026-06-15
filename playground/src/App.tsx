@@ -23,8 +23,8 @@ export default function App() {
             <h1 className={styles.title}>Typed Japanese</h1>
             <p className={styles.tagline}>
               {t(
-                "Learn Japanese grammar — every sentence is a type the compiler can read.",
-                "用 TypeScript 学日语语法 —— 每个句子都是编译器能读懂的类型。"
+                "Learn Japanese grammar as TypeScript types.",
+                "用 TypeScript 类型学日语语法。"
               )}
             </p>
           </div>
