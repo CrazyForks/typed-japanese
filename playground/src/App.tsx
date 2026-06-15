@@ -2,6 +2,7 @@ import { useState } from "react";
 import Tutorial from "./components/Tutorial";
 import Playground from "./components/Playground";
 import Glossary from "./components/Glossary";
+import FontLab from "./components/FontLab";
 import { useLang } from "./context/lang";
 import { useTheme } from "./context/theme";
 import styles from "./App.module.css";
@@ -112,6 +113,8 @@ export default function App() {
           "所有活用变形都由 TypeScript 类型系统推导 —— 可被编译器验证的语法。"
         )}
       </footer>
+
+      {import.meta.env.DEV && <FontLab />}
     </div>
   );
 }

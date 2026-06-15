@@ -102,6 +102,7 @@
 
 .chapterTitle {
   margin: 4px 0 6px;
+  font-family: var(--font-heading);
   font-size: 1.7rem;
   font-weight: 800;
   color: var(--ink-900);
@@ -122,6 +123,7 @@
 
 .pointTitle {
   margin: 0 0 8px;
+  font-family: var(--font-heading);
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--sakura-600);

@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <title>Typed Japanese Playground</title>
+    <!-- Tutorial type: textbook feel. Klee One for Japanese (教科書体),
+         LXGW WenKai Screen for Chinese prose (楷体). Both are unicode-range
+         split, so only the glyphs actually on screen get downloaded. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Noto+Serif+JP:wght@400;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont/style.css"
+    />
     <script>
       // Resolve the theme before first paint so there is no light-mode flash.
       // Order: explicit stored choice, then OS preference.

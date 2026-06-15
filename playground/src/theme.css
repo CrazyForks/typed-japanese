@@ -69,8 +69,12 @@
   --bg-glow-1: rgba(251, 227, 234, 0.9);
   --bg-glow-2: rgba(244, 198, 212, 0.55);
 
-  --font-jp: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
-  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Textbook type. Japanese in Klee One (教科書体); Chinese/Latin prose in
+     LXGW WenKai (霞鹜文楷, 楷体) — warmer and more "course-like" than the old
+     gothic. Loaded in index.html; gracefully falls back to system mincho. */
+  --font-jp: "Klee One", "LXGW WenKai Screen", "Hiragino Mincho ProN", serif;
+  --font-ui: "LXGW WenKai Screen", "Klee One", "Noto Serif SC", "Songti SC", serif;
+  --font-heading: "Klee One", "LXGW WenKai Screen", "Noto Serif SC", serif;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
