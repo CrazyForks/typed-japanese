@@ -13,9 +13,9 @@ import type {
   IrregularVerb,
   Verb,
 } from "./verb-types";
+import type { Copula, CopulaForm } from "./copula-types";
 import type { InterrogativeAdverb, WhyInterrogative } from "./adverb-types";
 import type { ProperNoun } from "./noun-types";
-import type { Copula, CopulaForm } from "./copula-types";
 
 // Particle system
 export type Particle =
