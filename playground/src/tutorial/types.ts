@@ -43,3 +43,27 @@ export interface Chapter {
   summaryZh: string;
   points: GrammarPoint[];
 }
+
+/**
+ * One occurrence of a vocab word in a tutorial example, as stored in the
+ * build-time reverse index (tutorial/reverseIndex.generated.ts). Lets the
+ * glossary answer "which example sentences reference this word?".
+ */
+export interface ExampleRef {
+  chapterId: string;
+  chapterTitleEn: string;
+  chapterTitleZh: string;
+  pointTitleEn: string;
+  pointTitleZh: string;
+  /** DOM id of the example card — see {@link exampleAnchorId}. */
+  anchor: string;
+  /** The Japanese sentence, used as the link label. */
+  jp: string;
+}
+
+/** Stable DOM id for an example card, shared by the renderer and the indexer. */
+export const exampleAnchorId = (
+  chapterId: string,
+  pointId: string,
+  index: number
+): string => `ex-${chapterId}-${pointId}-${index}`;

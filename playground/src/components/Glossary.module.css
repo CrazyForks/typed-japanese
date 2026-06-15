@@ -101,3 +101,69 @@
 .meaning {
   color: var(--ink-700);
 }
+
+.rowClickable {
+  cursor: pointer;
+}
+
+.usedIn {
+  white-space: nowrap;
+}
+
+.usedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--sakura-600);
+  background: var(--sakura-100);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.caret {
+  font-size: 0.6rem;
+  opacity: 0.8;
+}
+
+.refRow td {
+  background: var(--surface-2);
+  padding: 10px 14px 14px;
+}
+
+.refList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.refItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.refItem:hover {
+  border-color: var(--sakura-400);
+  background: var(--sakura-50);
+}
+
+.refJp {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.refCtx {
+  font-size: 0.74rem;
+  color: var(--ink-500);
+}

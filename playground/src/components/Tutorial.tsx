@@ -1,7 +1,14 @@
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { CHAPTERS } from "../tutorial/chapters";
 import { LEVEL_META } from "../tutorial/levels";
-import type { Chapter, Example, Level } from "../tutorial/types";
+import { exampleAnchorId, type Chapter, type Example, type Level } from "../tutorial/types";
 import { useLang } from "../context/lang";
 import { extractWords } from "../vocab/extract";
 import Analyzer from "./Analyzer";
@@ -31,12 +38,47 @@ function RichText({ text }: { text: string }): ReactNode {
   );
 }
 
-export default function Tutorial() {
+type Props = {
+  /** A glossary "used in" link requesting a jump to an example. */
+  jump: { chapterId: string; anchor: string } | null;
+  onJumpHandled: () => void;
+};
+
+export default function Tutorial({ jump, onJumpHandled }: Props) {
   const { lang, t } = useLang();
   const [query, setQuery] = useState("");
-  const [activeId, setActiveId] = useState<string>(CHAPTERS[0]?.id ?? "");
+  const [activeId, setActiveId] = useState<string>(
+    jump?.chapterId ?? CHAPTERS[0]?.id ?? ""
+  );
   const [drawerExample, setDrawerExample] = useState<Example | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
+  const pendingAnchor = useRef<string | null>(null);
+
+  // A jump request: select the chapter, then mark the anchor for scrolling.
+  useEffect(() => {
+    if (!jump) return;
+    pendingAnchor.current = jump.anchor;
+    setActiveId(jump.chapterId);
+    onJumpHandled();
+  }, [jump, onJumpHandled]);
+
+  // After the target chapter has rendered, scroll the example into view and
+  // flash it. Runs after every render until the anchor element exists.
+  useLayoutEffect(() => {
+    const anchor = pendingAnchor.current;
+    if (!anchor) return;
+    const el = document.getElementById(anchor);
+    if (!el) return;
+    pendingAnchor.current = null;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setFlash(anchor);
+    const timer = window.setTimeout(
+      () => setFlash((f) => (f === anchor ? null : f)),
+      1800
+    );
+    return () => window.clearTimeout(timer);
+  });
 
   const byLevel = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -127,8 +169,14 @@ export default function Tutorial() {
                 </div>
 
                 <div className={styles.examples}>
-                  {pt.examples.map((ex, i) => (
-                    <div key={i} className={`tj-card ${styles.example}`}>
+                  {pt.examples.map((ex, i) => {
+                    const anchor = exampleAnchorId(active.id, pt.id, i);
+                    return (
+                    <div
+                      key={i}
+                      id={anchor}
+                      className={`tj-card ${styles.example} ${flash === anchor ? styles.exampleFlash : ""}`}
+                    >
                       <button
                         type="button"
                         className={`jp ${styles.exJp}`}
@@ -155,7 +203,8 @@ export default function Tutorial() {
                         ))}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             ))}

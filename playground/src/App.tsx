@@ -13,6 +13,14 @@ export default function App() {
   const { lang, setLang, t } = useLang();
   const { theme, toggleTheme } = useTheme();
   const [tab, setTab] = useState<Tab>("tutorial");
+  const [jump, setJump] = useState<{ chapterId: string; anchor: string } | null>(
+    null
+  );
+
+  const navigateToExample = (chapterId: string, anchor: string) => {
+    setJump({ chapterId, anchor });
+    setTab("tutorial");
+  };
 
   return (
     <div className={styles.app}>
@@ -105,8 +113,10 @@ export default function App() {
       </nav>
 
       <main className={styles.main}>
-        {tab === "tutorial" && <Tutorial />}
-        {tab === "glossary" && <Glossary />}
+        {tab === "tutorial" && (
+          <Tutorial jump={jump} onJumpHandled={() => setJump(null)} />
+        )}
+        {tab === "glossary" && <Glossary onNavigate={navigateToExample} />}
         {tab === "playground" && <Playground />}
       </main>
 
