@@ -74,7 +74,8 @@ function parseHash(hash: string): Route {
   const raw = hash.replace(/^#\/?/, "");
   const [path = "", qs] = raw.split("?");
   const segs = path.split("/").filter(Boolean);
-  const tab = SEG_TO_TAB[segs[0] ?? ""] ?? "concepts";
+  // Default landing is the Grammar Course; the first chapter points to Foundations.
+  const tab = SEG_TO_TAB[segs[0] ?? ""] ?? "tutorial";
   const params = new URLSearchParams(qs ?? "");
   const langParam = params.get("lang");
   const lang: Lang =

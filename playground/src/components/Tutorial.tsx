@@ -160,6 +160,26 @@ export default function Tutorial() {
               <p className={styles.chapterSummary}>{t(active.summaryEn, active.summaryZh)}</p>
             </header>
 
+            {active.id === CHAPTERS[0]?.id && (
+              <button
+                type="button"
+                className={styles.foundationsNote}
+                onClick={() =>
+                  navigate({ tab: "concepts", article: "architecture" })
+                }
+              >
+                <span className={styles.foundationsNoteText}>
+                  {t(
+                    "New to Japanese? Read the Foundations primer first — it shows how a sentence is built, the way you'd learn a programming language.",
+                    "刚接触日语？建议先读一遍《原理》—— 它会像学编程语言那样，讲清楚一句日语是怎么搭起来的。"
+                  )}
+                </span>
+                <span className={styles.foundationsNoteCta}>
+                  {t("Open Foundations", "打开原理")} →
+                </span>
+              </button>
+            )}
+
             {active.points.map((pt) => (
               <section key={pt.id} className={styles.point}>
                 <h3 className={styles.pointTitle}>{t(pt.titleEn, pt.titleZh)}</h3>

@@ -115,6 +115,47 @@
   max-width: 70ch;
 }
 
+/* pointer to the Foundations primer, shown on the very first chapter */
+.foundationsNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  width: 100%;
+  max-width: 72ch;
+  margin: 18px 0 4px;
+  padding: 13px 16px;
+  text-align: left;
+  cursor: pointer;
+  background: var(--sakura-50);
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--sakura-400);
+  border-radius: var(--radius-sm);
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+
+.foundationsNote:hover {
+  background: var(--sakura-100);
+  border-color: var(--sakura-400);
+  transform: translateY(-1px);
+}
+
+.foundationsNoteText {
+  flex: 1 1 22ch;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-700);
+}
+
+.foundationsNoteCta {
+  flex: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--sakura-600);
+}
+
 .point {
   margin: 26px 0;
   padding-top: 18px;
