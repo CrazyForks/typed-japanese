@@ -458,7 +458,14 @@ function structuralAudit(code: string): string[] {
     if (isTechnicalTerm(value) && kind !== "TechnicalTermPart") {
       errors.push(`structure: ${kind}<${JSON.stringify(value)}> looks technical; use TechnicalTermPart`);
     }
-    const buried = KANA_LEXEME_EXCEPTIONS.has(value) ? null : hasBuriedParticle(value);
+    // Only a noun realistically crams a case particle onto its tail (会社に). An
+    // adverb / intensifier / nested phrase is an atomic or multi-word lexeme, so
+    // splitting a particle homograph out of e.g. AdverbPart<"いつも"> (always) or
+    // とても would be wrong — don't run the buried-particle check on those.
+    const buried =
+      kind === "NounPart" && !KANA_LEXEME_EXCEPTIONS.has(value)
+        ? hasBuriedParticle(value)
+        : null;
     if (buried) {
       errors.push(`structure: ${kind}<${JSON.stringify(value)}> hides particle ${JSON.stringify(buried)}; split it into ParticlePart`);
     }

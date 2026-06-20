@@ -12,8 +12,10 @@ final class ChatViewModel: ObservableObject {
     @Published var model: String = ""
     @Published var errorMessage: String?
 
-    /// Supplies the live grammar context; nil until annotation succeeds.
-    var contextProvider: () -> ChatContext? = { nil }
+    /// The live grammar context, pushed in by the annotation view model whenever a
+    /// sentence is annotated/re-parsed. `@Published` so the chat pane re-renders
+    /// (and enables) the moment a result exists — nil until then.
+    @Published var context: ChatContext?
 
     private let cli: CLIService
 
@@ -22,7 +24,7 @@ final class ChatViewModel: ObservableObject {
     }
 
     var isEnabled: Bool {
-        contextProvider() != nil
+        context != nil
     }
 
     var canSend: Bool {
@@ -33,7 +35,7 @@ final class ChatViewModel: ObservableObject {
 
     func send() async {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty, let context = contextProvider() else { return }
+        guard !text.isEmpty, let context else { return }
 
         messages.append(ChatMessage(role: .user, text: text))
         draft = ""

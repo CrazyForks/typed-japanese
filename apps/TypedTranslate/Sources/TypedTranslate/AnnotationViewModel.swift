@@ -27,6 +27,11 @@ final class AnnotationViewModel: ObservableObject {
 
     private let cli: CLIService
 
+    /// Called whenever the grammar context changes (annotate / reparse), so the
+    /// chat pane can mirror it. Wired in the App. Pushing (vs. the chat pulling)
+    /// is what lets the chat pane re-render the instant a result exists.
+    var onContextChange: ((ChatContext?) -> Void)?
+
     init(cli: CLIService) {
         self.cli = cli
     }
@@ -35,7 +40,8 @@ final class AnnotationViewModel: ObservableObject {
         !sentence.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isAnnotating
     }
 
-    /// Grammar context for the chat pane, derived from the current result.
+    /// Grammar context for the chat pane, derived from the current result. Present
+    /// whenever there's an annotation to discuss — even one with audit issues.
     var chatContext: ChatContext? {
         guard hasResult, !code.isEmpty else { return nil }
         return ChatContext(
@@ -65,6 +71,7 @@ final class AnnotationViewModel: ObservableObject {
             if !result.ok && errorMessage == nil {
                 errorMessage = result.errors.first ?? "Annotation did not type-check."
             }
+            onContextChange?(chatContext)
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
@@ -87,6 +94,7 @@ final class AnnotationViewModel: ObservableObject {
             if !result.ok, let first = result.errors.first {
                 errorMessage = first
             }
+            onContextChange?(chatContext)
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }

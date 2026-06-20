@@ -25,9 +25,13 @@ struct TypedTranslateApp: App {
                 .frame(minWidth: 720, minHeight: 460)
                 .onAppear {
                     // Keep the chat engine in sync with the annotation engine and
-                    // wire the live grammar context provider.
+                    // mirror the live grammar context into the chat pane so it
+                    // enables the instant a sentence is annotated.
                     chat.engine = annotation.engine
-                    chat.contextProvider = { [weak annotation] in annotation?.chatContext }
+                    annotation.onContextChange = { [weak chat] context in
+                        chat?.context = context
+                    }
+                    chat.context = annotation.chatContext
                 }
         }
         .windowStyle(.titleBar)
