@@ -101,20 +101,28 @@ Or run it directly with the Swift toolchain:
 swift run
 ```
 
-## One-click test
+## Launching & testing
 
-From the repo root, `bun macos` validates the whole stack and then opens the app
-— the fastest way to confirm a working setup:
+From the repo root:
 
 ```sh
-bun macos                  # toolchain + swift build + bridge parse + live model, then launch
-bun macos --no-launch      # checks only (CI-friendly; exits non-zero on failure)
-bun macos --skip-live      # skip the codex/claude call (offline / fast)
-bun macos --engine claude  # use claude for the live annotation (default: codex)
+bun macos        # just launch the app (no checks)
+bun macos:test   # run the smoke checks (no launch)
 ```
 
-(`bun macos` is wired in the root `package.json` to `apps/TypedTranslate/smoke.ts`,
-a Bun Shell script you can also run directly as `./smoke.ts`.)
+`bun macos` is wired to `apps/TypedTranslate/run.ts` (sets the env vars and
+`swift run`s the app). `bun macos:test` runs `apps/TypedTranslate/smoke.ts`, a
+Bun Shell script that checks the whole stack — `bun`/`swift`/`codex`/`claude` on
+the login PATH → `swift build` → a deterministic bridge `parse` (asserts a known
+snippet resolves to `食べたよ`) → one live `annotate+parse`. A model that fails to
+verify is a *soft* failure (the plumbing answered); a build or bridge error is a
+hard failure. Extra flags pass through to the script:
+
+```sh
+bun macos:test            # default: codex, no launch
+./smoke.ts --skip-live    # skip the codex/claude call (offline / fast)
+./smoke.ts --engine claude --no-launch
+```
 
 It checks, in order: `bun`/`swift`/`codex`/`claude` on the login PATH → `swift
 build` → a deterministic bridge `parse` (asserts a known snippet resolves to

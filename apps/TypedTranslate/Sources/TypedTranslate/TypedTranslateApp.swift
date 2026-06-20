@@ -22,7 +22,7 @@ struct TypedTranslateApp: App {
             ContentView()
                 .environmentObject(annotation)
                 .environmentObject(chat)
-                .frame(minWidth: 960, minHeight: 600)
+                .frame(minWidth: 720, minHeight: 460)
                 .onAppear {
                     // Keep the chat engine in sync with the annotation engine and
                     // wire the live grammar context provider.
@@ -31,6 +31,7 @@ struct TypedTranslateApp: App {
                 }
         }
         .windowStyle(.titleBar)
-        .defaultSize(width: 1180, height: 760)
+        // Half the 14" MacBook Pro default logical resolution (1512×982 pt).
+        .defaultSize(width: 756, height: 491)
     }
 }
