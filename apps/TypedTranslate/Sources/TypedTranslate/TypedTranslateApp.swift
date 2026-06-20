@@ -35,7 +35,7 @@ struct TypedTranslateApp: App {
                 }
         }
         .windowStyle(.titleBar)
-        // Half the 14" MacBook Pro default logical resolution (1512×982 pt).
-        .defaultSize(width: 756, height: 491)
+        // Open at the minimum size (matches the .frame minWidth/minHeight above).
+        .defaultSize(width: 720, height: 460)
     }
 }
