@@ -24,7 +24,7 @@ export const SNIPPETS: ReadonlyArray<Snippet> = [
 type 話す = GodanVerb & { stem: "話"; ending: "す" };
 
 // Conjugate it. Hover 話して in the editor — TypeScript computes "話して".
-type 話して = ConjugateVerb<話す, "て形">;
+type 話して = ConjugateVerb<話す, "Te">;
 `,
   },
   {
@@ -43,7 +43,7 @@ type ヒンメル = ProperNoun<"ヒンメル">;
 type する = IrregularVerb & { dictionary: "する" };
 
 // そうした = "did so" (past form of そうする)
-type そうした = DemonstrativeAction<"そう", する, "た形">;
+type そうした = DemonstrativeAction<"そう", する, "Ta">;
 
 type ヒンメルならそうした = ConditionalPhrase<ヒンメル, "なら", そうした>;
 `,
@@ -65,8 +65,8 @@ type ヒンメルならそうした = ConditionalPhrase<ヒンメル, "なら", 
 type いい = IAdjective & { stem: "い"; ending: "い"; irregular: true };
 type 来る = IrregularVerb & { dictionary: "来る" };
 
-type いいよ = PhraseWithParticle<ConjugateAdjective<いい, "基本形">, "よ">;
-type 来いよ = PhraseWithParticle<ConjugateVerb<来る, "命令形">, "よ">;
+type いいよ = PhraseWithParticle<ConjugateAdjective<いい, "Basic">, "よ">;
+type 来いよ = PhraseWithParticle<ConjugateVerb<来る, "Imperative">, "よ">;
 
 type いいよ来いよ = ConnectedPhrases<いいよ, 来いよ>;
 `,
@@ -85,7 +85,7 @@ type どうしてパンを食べるの = InterrogativePhrase<
   "どうして",
   "パンを",
   食べる,
-  "辞書形",
+  "Dictionary",
   "の"
 >;
 `,
@@ -103,7 +103,7 @@ type どうしてパンを食べるの = InterrogativePhrase<
 
 type 綺麗 = NaAdjective & { stem: "綺麗" };
 
-type 綺麗ですね = PhraseWithParticle<ConjugateAdjective<綺麗, "丁寧形">, "ね">;
+type 綺麗ですね = PhraseWithParticle<ConjugateAdjective<綺麗, "Polite">, "ね">;
 `,
   },
 ];

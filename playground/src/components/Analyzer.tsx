@@ -68,6 +68,7 @@ export default function Analyzer({ code, gloss }: Props) {
   const [tree, setTree] = useState<CompositionNode | null>(null);
   const [diagnostics, setDiagnostics] = useState<Diag[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [showWhitespace, setShowWhitespace] = useState(false);
   const [ready, setReady] = useState(false);
 
   const editorRef = useRef<StandaloneEditor | null>(null);
@@ -225,26 +226,44 @@ export default function Analyzer({ code, gloss }: Props) {
     [tree, selectedNodeId]
   );
 
+  useEffect(() => {
+    if (!showWhitespace && selectedNode?.category === "whitespace") {
+      setSelectedNodeId(null);
+      decorationsRef.current?.clear();
+    }
+  }, [selectedNode, showWhitespace]);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Sentence structure — visualization on top */}
       <section className="tj-card flex flex-col overflow-hidden p-0">
         <div className="flex items-center justify-between gap-2.5 px-4 py-3 border-b border-border">
           <h2 className="tj-panel-title">Sentence structure</h2>
-          {aliases.length > 1 && (
-            <select
-              className="tj-select w-auto max-w-[230px] px-2.5 py-[5px] font-jp text-[0.86rem]"
-              value={selectedAlias ?? ""}
-              onChange={(e) => pickAlias(e.target.value)}
-              aria-label="Type to visualise"
-            >
-              {aliases.map((a) => (
-                <option key={a.name} value={a.name}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
-          )}
+          <div className="flex items-center gap-2.5 flex-wrap justify-end">
+            <label className="flex items-center gap-1.5 text-[0.78rem] font-bold text-ink-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="accent-sakura-500"
+                checked={showWhitespace}
+                onChange={(e) => setShowWhitespace(e.target.checked)}
+              />
+              <span>空白</span>
+            </label>
+            {aliases.length > 1 && (
+              <select
+                className="tj-select w-auto max-w-[230px] px-2.5 py-[5px] font-jp text-[0.86rem]"
+                value={selectedAlias ?? ""}
+                onChange={(e) => pickAlias(e.target.value)}
+                aria-label="Type to visualise"
+              >
+                {aliases.map((a) => (
+                  <option key={a.name} value={a.name}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-0.5 pt-3.5 px-4 pb-2">
@@ -260,6 +279,7 @@ export default function Analyzer({ code, gloss }: Props) {
               node={tree}
               selectedId={selectedNodeId}
               onSelect={handleSelectNode}
+              showWhitespace={showWhitespace}
             />
           ) : (
             <p className="tj-subtle">

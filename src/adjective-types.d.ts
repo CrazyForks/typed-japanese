@@ -20,7 +20,8 @@ export type AdjectiveConjugationForm =
   | "Basic" // Basic form
   | "Polite" // Polite form
   | "Past" // Past form
-  | "Negative"; // Negative form
+  | "Negative" // Negative form
+  | "Te"; // Connective form
 
 // I-adjective conjugation mapping
 type IAdjectiveConjugationMap = {
@@ -29,6 +30,7 @@ type IAdjectiveConjugationMap = {
     Polite: "いです";
     Past: "かった";
     Negative: "くない";
+    Te: "くて";
   };
 };
 

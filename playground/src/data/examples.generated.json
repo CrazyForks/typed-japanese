@@ -1,0 +1,16 @@
+[
+  {
+    "id": "gen-mmlgl",
+    "title": "Verb · past",
+    "jp": "食べた",
+    "en": "\"ate\" — the past form of the ichidan verb 食べる",
+    "code": "import type { IchidanVerb, Sentence, VerbPart } from \"typed-japanese\";\n\ntype 食べる = IchidanVerb & { stem: \"食べ\"; ending: \"る\" };\ntype 食べた = Sentence<[VerbPart<食べる, \"Ta\">]>;\n"
+  },
+  {
+    "id": "gen-1ys44t3",
+    "title": "Platform · migrate TODO",
+    "jp": "platform-migrate-job.yaml の pb_test_<slug> + sim-users seed はまだ TODO（platform 側に seed:test-env スクリプトが要る）。それまで env は隔離されたまま起動するが、connector / agent-IM mint は degraded になりうる。これは「不完全でも隔離優先」という今回の方針どおり。",
+    "en": "The platform migration job seed setup is still TODO; until then env stays isolated, possible degraded minting is accepted under the current isolation-first policy.",
+    "code": "import type { GodanVerb, NaAdjective, SuruVerb, Sentence, TechnicalTermPart, WhitespacePart, NounPart, AdverbPart, ParticlePart, PunctuationPart, VerbPart, AdjectivePart, SuffixPart } from \"typed-japanese\";\n\ntype 要る = GodanVerb & { type: \"godan\"; stem: \"要\"; ending: \"る\" };\ntype いう = GodanVerb & { type: \"godan\"; stem: \"い\"; ending: \"う\" };\ntype 不完全 = NaAdjective & { type: \"na-adjective\"; stem: \"不完全\" };\n\ntype TypedJapanese = Sentence<[\n  TechnicalTermPart<\"platform-migrate-job.yaml\">,\n  WhitespacePart<\" \">,\n  ParticlePart<\"の\">,\n  WhitespacePart<\" \">,\n  TechnicalTermPart<\"pb_test_<slug> + sim-users seed\">,\n  WhitespacePart<\" \">,\n  ParticlePart<\"は\">,\n  AdverbPart<\"まだ\">,\n  WhitespacePart<\" \">,\n  TechnicalTermPart<\"TODO\">,\n  PunctuationPart<\"（\">,\n  TechnicalTermPart<\"platform\">,\n  WhitespacePart<\" \">,\n  NounPart<\"側\">,\n  ParticlePart<\"に\">,\n  WhitespacePart<\" \">,\n  TechnicalTermPart<\"seed:test-env\">,\n  WhitespacePart<\" \">,\n  NounPart<\"スクリプト\">,\n  ParticlePart<\"が\">,\n  VerbPart<要る, \"Dictionary\">,\n  PunctuationPart<\"）\">,\n  PunctuationPart<\"。\">,\n  NounPart<\"それ\">,\n  ParticlePart<\"まで\">,\n  WhitespacePart<\" \">,\n  TechnicalTermPart<\"env\">,\n  WhitespacePart<\" \">,\n  ParticlePart<\"は\">,\n  NounPart<\"隔離\">,\n  SuffixPart<\"された\">,\n  SuffixPart<\"まま\">,\n  VerbPart<SuruVerb<\"起動\">, \"Dictionary\">,\n  ParticlePart<\"が\">,\n  PunctuationPart<\"、\">,\n  TechnicalTermPart<\"connector / agent-IM mint\">,\n  WhitespacePart<\" \">,\n  ParticlePart<\"は\">,\n  WhitespacePart<\" \">,\n  TechnicalTermPart<\"degraded\">,\n  WhitespacePart<\" \">,\n  ParticlePart<\"に\">,\n  SuffixPart<\"なりうる\">,\n  PunctuationPart<\"。\">,\n  NounPart<\"これ\">,\n  ParticlePart<\"は\">,\n  PunctuationPart<\"「\">,\n  AdjectivePart<不完全, \"Te\">,\n  ParticlePart<\"も\">,\n  NounPart<\"隔離優先\">,\n  PunctuationPart<\"」\">,\n  ParticlePart<\"と\">,\n  VerbPart<いう, \"Dictionary\">,\n  NounPart<\"今回\">,\n  ParticlePart<\"の\">,\n  NounPart<\"方針\">,\n  SuffixPart<\"どおり\">,\n  PunctuationPart<\"。\">\n]>;\n"
+  }
+]

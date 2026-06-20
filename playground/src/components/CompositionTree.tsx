@@ -11,8 +11,13 @@ export const CATEGORY_META: Record<
   verb: { jp: "動詞", en: "Verb", varName: "--cat-verb" },
   adjective: { jp: "形容詞", en: "Adjective", varName: "--cat-adjective" },
   noun: { jp: "名詞", en: "Noun", varName: "--cat-noun" },
+  technical: { jp: "技術語", en: "Technical", varName: "--cat-noun" },
+  whitespace: { jp: "空白", en: "Whitespace", varName: "--cat-literal" },
   adverb: { jp: "副詞", en: "Adverb", varName: "--cat-adverb" },
   particle: { jp: "助詞", en: "Particle", varName: "--cat-particle" },
+  copula: { jp: "コピュラ", en: "Copula", varName: "--cat-conjugation" },
+  suffix: { jp: "接尾", en: "Suffix", varName: "--cat-form" },
+  punctuation: { jp: "記号", en: "Punctuation", varName: "--cat-literal" },
   form: { jp: "活用形", en: "Form", varName: "--cat-form" },
   demonstrative: { jp: "指示詞", en: "Demonstrative", varName: "--cat-demonstrative" },
   interrogative: { jp: "疑問詞", en: "Interrogative", varName: "--cat-interrogative" },
@@ -24,6 +29,7 @@ interface Props {
   node: CompositionNode;
   selectedId: string | null;
   onSelect: (node: CompositionNode) => void;
+  showWhitespace?: boolean;
   depth?: number;
 }
 
@@ -31,9 +37,12 @@ export default function CompositionTree({
   node,
   selectedId,
   onSelect,
+  showWhitespace = false,
   depth = 0,
 }: Props) {
   const { lang } = useLang();
+  if (!showWhitespace && node.category === "whitespace") return null;
+
   const meta = CATEGORY_META[node.category];
   const color = `var(${meta.varName})`;
   const isLiteral = node.ctor === null && node.children.length === 0;
@@ -82,15 +91,18 @@ export default function CompositionTree({
 
       {node.children.length > 0 && (
         <div className="ml-4 pl-3 border-l-2 border-dashed border-border-strong">
-          {node.children.map((child) => (
-            <CompositionTree
-              key={child.id}
-              node={child}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              depth={depth + 1}
-            />
-          ))}
+          {node.children
+            .filter((child) => showWhitespace || child.category !== "whitespace")
+            .map((child) => (
+              <CompositionTree
+                key={child.id}
+                node={child}
+                selectedId={selectedId}
+                onSelect={onSelect}
+                showWhitespace={showWhitespace}
+                depth={depth + 1}
+              />
+            ))}
         </div>
       )}
     </div>

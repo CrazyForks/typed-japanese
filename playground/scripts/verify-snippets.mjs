@@ -1,6 +1,6 @@
 /**
- * Verify that every tutorial example's `code` snippet type-checks against the
- * real Typed Japanese library. Run from the playground/ directory:
+ * Verify that every tutorial/generated example's `code` snippet type-checks
+ * against the real Typed Japanese library. Run from the playground/ directory:
  *
  *   node scripts/verify-snippets.mjs            # human summary
  *   node scripts/verify-snippets.mjs --json     # machine-readable failures
@@ -19,6 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PLAYGROUND = path.resolve(__dirname, "..");
 const REPO = path.resolve(PLAYGROUND, "..");
 const CHAPTERS_DIR = path.join(PLAYGROUND, "src/tutorial/chapters");
+const GENERATED_JSON = path.join(PLAYGROUND, "src/data/examples.generated.json");
 const IGNORE = new Set([6133, 6196, 6192, 6198, 6205]);
 
 const jsonOut = process.argv.includes("--json");
@@ -59,6 +60,20 @@ for (const f of chapterFiles) {
       });
     })
   );
+}
+
+if (fs.existsSync(GENERATED_JSON)) {
+  const generated = JSON.parse(fs.readFileSync(GENERATED_JSON, "utf8"));
+  if (Array.isArray(generated)) {
+    generated.forEach((ex, i) => {
+      examples.push({
+        id: "generated",
+        file: `generated/${ex.id ?? i}`,
+        jp: ex.jp ?? "",
+        code: ex.code ?? "",
+      });
+    });
+  }
 }
 
 // --- build one in-memory program over all snippets ---
@@ -146,7 +161,7 @@ for (const ex of examples) {
 if (jsonOut) {
   console.log(JSON.stringify({ total: examples.length, failed: report.length, report }, null, 2));
 } else {
-  console.log(`Checked ${examples.length} example snippets across ${chapterFiles.length} chapters.`);
+  console.log(`Checked ${examples.length} example snippets across ${chapterFiles.length} chapters plus generated snippets.`);
   if (report.length === 0) {
     console.log("✓ All snippets type-check against the library.");
   } else {

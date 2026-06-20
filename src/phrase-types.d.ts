@@ -11,6 +11,7 @@ import type {
   GodanVerb,
   IchidanVerb,
   IrregularVerb,
+  SuruVerb,
   Verb,
 } from "./verb-types";
 import type { Copula, CopulaForm } from "./copula-types";
@@ -33,7 +34,27 @@ export type Particle =
   | "か" // Question particle
   | "よね" // Combined emphasis and agreement
   | "の" // Nominalizer/question particle
-  | "も"; // Also/even particle
+  | "も" // Also/even particle
+  | "なら" // Conditional/topic particle
+  | "たら" // Conditional particle
+  | "れば" // Conditional particle
+  | "でも" // Even if / even with
+  | "だけ" // Only
+  | "しか" // Only (with negative predicate)
+  | "ばかり" // Only / just
+  | "より" // Than / from
+  | "ほど" // Extent / about
+  | "や" // And / such as
+  | "とか" // Such as / quote-like
+  | "って" // Casual topic/quote marker
+  | "こそ" // Emphatic focus
+  | "さえ" // Even
+  | "くらい" // About / extent
+  | "ぐらい" // About / extent
+  | "ので" // Because
+  | "けど" // But / although
+  | "のに" // Although
+  | "し"; // Listing reasons
 // Note: the copula だ is NOT a particle. It inflects, so it lives in
 // ./copula-types as `ConjugateCopula` / `Copula`.
 
@@ -43,10 +64,15 @@ export type PunctuationMark =
   | "。" // Japanese period (句点/くてん)
   | "！" // Exclamation mark
   | "？" // Question mark
+  | "（" // Opening full-width parenthesis
+  | "）" // Closing full-width parenthesis
+  | "(" // Opening ASCII parenthesis
+  | ")" // Closing ASCII parenthesis
   | "「" // Opening quotation mark
   | "」" // Closing quotation mark
   | "『" // Opening double quotation mark
-  | "』"; // Closing double quotation mark
+  | "』" // Closing double quotation mark
+  | "・"; // Interpunct
 
 // Conditional particles
 export type ConditionalParticle = "なら" | "たら" | "れば" | "と";
@@ -104,9 +130,12 @@ export type PhrasePart =
   | VerbPart
   | AdjectivePart
   | NounPart
+  | TechnicalTermPart
+  | WhitespacePart
   | AdverbPart
   | ParticlePart
   | CopulaPart
+  | SuffixPart
   | IntensifierPart
   | ContractedPart
   | NestedPhrasePart
@@ -139,6 +168,18 @@ export type NounPart<N extends string = string> = {
   value: N;
 };
 
+export type TechnicalTermPart<T extends string = string> = {
+  type: "technical";
+  term: T;
+  value: T;
+};
+
+export type WhitespacePart<W extends string = " "> = {
+  type: "whitespace";
+  whitespace: W;
+  value: W;
+};
+
 export type AdverbPart<A extends string = string> = {
   type: "adverb";
   adverb: A;
@@ -155,6 +196,12 @@ export type CopulaPart<F extends CopulaForm = CopulaForm> = {
   type: "copula";
   form: F;
   value: Copula<F>;
+};
+
+export type SuffixPart<S extends string = string> = {
+  type: "suffix";
+  suffix: S;
+  value: S;
 };
 
 export type IntensifierPart<I extends string = string> = {
@@ -183,10 +230,15 @@ export type PunctuationPart<P extends PunctuationMark = PunctuationMark> = {
   value: P;
 };
 
-type PhraseSequence<Parts extends PhrasePart[] = PhrasePart[]> = {
+export type PhraseSequence<Parts extends readonly PhrasePart[] = readonly PhrasePart[]> = {
   parts: Parts;
   value: JoinPhrasePartsValue<Parts>;
 };
+
+export type Sentence<Parts extends readonly PhrasePart[]> =
+  JoinPhrasePartsValue<Parts>;
+
+export type PartValue<Part extends PhrasePart> = Part["value"];
 
 export type NestedPhrase<T extends PhraseSequence<any>> = {
   type: "nestedPhrase";
@@ -194,13 +246,16 @@ export type NestedPhrase<T extends PhraseSequence<any>> = {
 };
 
 // Type helpers for joining phrase parts
-type JoinPhrasePartsValue<Parts extends readonly PhrasePart[]> =
+type JoinPhrasePartsValue<
+  Parts extends readonly PhrasePart[],
+  Acc extends string = ""
+> =
   Parts extends readonly [
     infer First extends PhrasePart,
-    ...infer Rest extends PhrasePart[]
+    ...infer Rest extends readonly PhrasePart[]
   ]
-    ? `${First["value"]}${JoinPhrasePartsValue<Rest>}`
-    : "";
+    ? JoinPhrasePartsValue<Rest, `${Acc}${First["value"]}`>
+    : Acc;
 
 // Define the pattern type for why-intensifier with emphasis particle
 export type WhyIntensifierPatternWithEmphasis<
@@ -225,3 +280,5 @@ type いいよ = PhraseWithParticle<ConjugateAdjective<いい, "Basic">, "よ">;
 type 来る = IrregularVerb & { dictionary: "来る" };
 type 来いよ = PhraseWithParticle<ConjugateVerb<来る, "Imperative">, "よ">;
 type いいよ来いよ = ConnectedPhrases<いいよ, 来いよ>;
+type 勉強する = SuruVerb<"勉強">;
+type 勉強した = Sentence<[VerbPart<勉強する, "Ta">]>;

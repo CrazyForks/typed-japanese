@@ -23,8 +23,13 @@ export type GrammarCategory =
   | "verb"
   | "adjective"
   | "noun"
+  | "technical"
+  | "whitespace"
   | "adverb"
   | "particle"
+  | "copula"
+  | "suffix"
+  | "punctuation"
   | "form"
   | "demonstrative"
   | "interrogative"
@@ -63,6 +68,8 @@ export interface Analysis {
 // --- grammar vocabulary (mirrors the library's .d.ts unions) -----------------
 
 const COMPOSITIONAL = new Set([
+  "Sentence",
+  "PhraseSequence",
   "ConditionalPhrase",
   "ConnectedPhrases",
   "InterrogativePhrase",
@@ -88,19 +95,35 @@ const CATEGORY_BY_NAME: Record<string, GrammarCategory> = {
   ConjugateVerb: "conjugation",
   ConjugateAdjective: "conjugation",
   ConjugateCopula: "conjugation",
+  Sentence: "phrase",
+  PhraseSequence: "phrase",
   GodanVerb: "verb",
   IchidanVerb: "verb",
   IrregularVerb: "verb",
+  SuruVerb: "verb",
   Verb: "verb",
   IAdjective: "adjective",
   NaAdjective: "adjective",
   Adjective: "adjective",
   ProperNoun: "noun",
+  VerbPart: "verb",
+  AdjectivePart: "adjective",
+  NounPart: "noun",
+  TechnicalTermPart: "technical",
+  WhitespacePart: "whitespace",
+  AdverbPart: "adverb",
+  ParticlePart: "particle",
+  CopulaPart: "copula",
+  SuffixPart: "suffix",
+  IntensifierPart: "adverb",
+  ContractedPart: "suffix",
+  NestedPhrasePart: "phrase",
+  PunctuationPart: "punctuation",
 };
 
 const FORMS = new Set([
   "Dictionary", "Masu", "Te", "Ta", "Nai", "Potential", "Passive", "Causative",
-  "Volitional", "Imperative", "Conditional", "Hypothetical", "Basic", "Polite", "Past", "Negative",
+  "Volitional", "Imperative", "Conditional", "Hypothetical", "Basic", "Polite", "Past", "Negative", "Ta",
   // copula forms
   "Plain", "PolitePast", "PoliteNegative", "NegativePast", "PoliteNegativePast",
   "CasualNegative", "CasualPoliteNegative", "Written",
@@ -112,7 +135,10 @@ const INTERROGATIVE = new Set([
 ]);
 const PARTICLES = new Set([
   "は", "が", "を", "に", "へ", "で", "と", "から", "まで", "よ", "ね", "か", "よね", "の", "も",
+  "なら", "たら", "れば", "でも", "だけ", "しか", "ばかり", "より", "ほど", "や", "とか", "って", "こそ", "さえ", "くらい",
+  "ぐらい", "ので", "けど", "のに", "し",
 ]);
+const PUNCTUATION = new Set(["、", "。", "！", "？", "（", "）", "(", ")", "「", "」", "『", "』", "・"]);
 
 function classifyLiteral(value: string): GrammarCategory {
   if (FORMS.has(value)) return "form";
@@ -120,6 +146,7 @@ function classifyLiteral(value: string): GrammarCategory {
   if (INTERROGATIVE.has(value)) return "interrogative";
   if (CONDITIONAL.has(value)) return "particle";
   if (PARTICLES.has(value)) return "particle";
+  if (PUNCTUATION.has(value)) return "punctuation";
   return "literal";
 }
 
@@ -281,6 +308,81 @@ export async function buildTree(
     return null;
   }
 
+  const PART_TYPES = new Set([
+    "VerbPart",
+    "AdjectivePart",
+    "NounPart",
+    "TechnicalTermPart",
+    "WhitespacePart",
+    "AdverbPart",
+    "ParticlePart",
+    "CopulaPart",
+    "SuffixPart",
+    "IntensifierPart",
+    "ContractedPart",
+    "NestedPhrasePart",
+    "PunctuationPart",
+  ]);
+
+  const SCALAR_PART_TYPES = new Set([
+    "NounPart",
+    "TechnicalTermPart",
+    "WhitespacePart",
+    "AdverbPart",
+    "ParticlePart",
+    "CopulaPart",
+    "SuffixPart",
+    "IntensifierPart",
+    "ContractedPart",
+    "NestedPhrasePart",
+    "PunctuationPart",
+  ]);
+
+  function stringLiteralArg(node: TS.TypeNode | undefined): string | null {
+    return node &&
+      ts.isLiteralTypeNode(node) &&
+      ts.isStringLiteral(node.literal)
+      ? node.literal.text
+      : null;
+  }
+
+  function buildPartNode(
+    name: string,
+    node: TS.TypeReferenceNode,
+    idPath: string,
+    start: number,
+    end: number,
+    sourceText: string,
+    alias?: string
+  ): CompositionNode {
+    const args = node.typeArguments ?? [];
+    const firstLiteral = stringLiteralArg(args[0]);
+    const lastLiteral = stringLiteralArg(args[args.length - 1]);
+    const label =
+      alias ??
+      (name === "CopulaPart"
+        ? "Copula"
+        : name === "WhitespacePart"
+        ? "space"
+        : name === "ContractedPart" && lastLiteral
+        ? lastLiteral
+        : firstLiteral ?? name);
+    const children = SCALAR_PART_TYPES.has(name)
+      ? []
+      : args.map((arg, i) => build(arg, `${idPath}.${i}`));
+
+    return {
+      id: idPath,
+      label,
+      ctor: name,
+      category: CATEGORY_BY_NAME[name] ?? "other",
+      text: `${sourceText}["value"]`,
+      start,
+      end,
+      children,
+    };
+  }
+
   function build(node: TS.TypeNode, idPath: string): CompositionNode {
     // Unwrap parentheses so `(A & B)` etc. don't add a useless level.
     if (ts.isParenthesizedTypeNode(node)) return build(node.type, idPath);
@@ -304,6 +406,20 @@ export async function buildTree(
         start,
         end,
         children: [],
+      };
+    }
+
+    // Tuple type inside Sentence<[...parts]>: show each part as a child.
+    if (ts.isTupleTypeNode(node)) {
+      return {
+        id: idPath,
+        label: "Parts",
+        ctor: "[]",
+        category: "phrase",
+        text,
+        start,
+        end,
+        children: node.elements.map((el, i) => build(el, `${idPath}.${i}`)),
       };
     }
 
@@ -339,15 +455,19 @@ export async function buildTree(
       (name && CATEGORY_BY_NAME[name]) || "other";
 
     let children: CompositionNode[] = [];
-    if (
-      name &&
-      COMPOSITIONAL.has(name) &&
-      ts.isTypeReferenceNode(eff.node) &&
-      eff.node.typeArguments
-    ) {
-      children = eff.node.typeArguments.map((arg, i) =>
-        build(arg, `${idPath}.${i}`)
-      );
+
+    if (name && PART_TYPES.has(name) && ts.isTypeReferenceNode(eff.node)) {
+      return buildPartNode(name, eff.node, idPath, start, end, text, eff.alias);
+    }
+
+    if (name && COMPOSITIONAL.has(name) && ts.isTypeReferenceNode(eff.node)) {
+      const args = eff.node.typeArguments ?? [];
+      const tupleArg = args[0] && ts.isTupleTypeNode(args[0]) ? args[0] : null;
+      if ((name === "Sentence" || name === "PhraseSequence") && tupleArg) {
+        children = tupleArg.elements.map((arg, i) => build(arg, `${idPath}.${i}`));
+      } else {
+        children = args.map((arg, i) => build(arg, `${idPath}.${i}`));
+      }
     }
 
     const label = eff.alias ?? name ?? text;

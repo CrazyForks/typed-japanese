@@ -16,7 +16,12 @@ export type IrregularVerb = {
   dictionary: "する" | "来る" | "くる";
 };
 
-export type Verb = GodanVerb | IchidanVerb | IrregularVerb;
+export type SuruVerb<Noun extends string = string> = {
+  type: "suru-verb";
+  noun: Noun;
+};
+
+export type Verb = GodanVerb | IchidanVerb | IrregularVerb | SuruVerb;
 
 // Conjugation forms
 export type ConjugationForm =
@@ -248,14 +253,20 @@ export type ConjugateVerb<
     : never
   : V extends IrregularVerb
   ? GetIrregularConjugation<V, F>
+  : V extends SuruVerb
+  ? F extends "Dictionary"
+    ? `${V["noun"]}する`
+    : `${V["noun"]}${GetIrregularConjugation<{ type: "irregular"; dictionary: "する" }, F>}`
   : never;
 
 // Example usage (we keep this for documentation)
 type 話す = GodanVerb & { stem: "話"; ending: "す" };
 type 食べる = IchidanVerb & { stem: "食べ"; ending: "る" };
 type する = IrregularVerb & { dictionary: "する" };
+type 勉強する = SuruVerb<"勉強">;
 
 // Type-level conjugation tests
 type 話すMasu = ConjugateVerb<話す, "Masu">; // Evaluates to "話し"
 type 食べるTe = ConjugateVerb<食べる, "Te">; // Evaluates to "食べて"
+type 勉強した = ConjugateVerb<勉強する, "Ta">; // Evaluates to "勉強した"
 type するImperative = ConjugateVerb<する, "Imperative">; // Evaluates to "しろ"
