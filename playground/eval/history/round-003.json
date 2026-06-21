@@ -1,0 +1,514 @@
+{
+  "round": 3,
+  "sampled": 8,
+  "scored": 8,
+  "roundScore": 0.9132,
+  "byDimension": {
+    "D1": 0.75,
+    "D2": 0.979,
+    "D3": 0.958,
+    "D4": 0.917,
+    "D5": 1,
+    "D6": 0.875
+  },
+  "perItem": [
+    {
+      "id": "r3-c0",
+      "source": "chapter",
+      "chapter": "i11",
+      "jp": "靴を履いたまま入りました",
+      "total": 11.67,
+      "verdict": "conforms",
+      "issueCount": 6
+    },
+    {
+      "id": "r3-c1",
+      "source": "chapter",
+      "chapter": "e07",
+      "jp": "私は勉強しませんでした",
+      "total": 10,
+      "verdict": "conforms",
+      "issueCount": 7
+    },
+    {
+      "id": "r3-c2",
+      "source": "chapter",
+      "chapter": "i14",
+      "jp": "行きますが遅れます",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 3
+    },
+    {
+      "id": "r3-c3",
+      "source": "chapter",
+      "chapter": "e10",
+      "jp": "手を洗ってから、食べます",
+      "total": 11.33,
+      "verdict": "conforms",
+      "issueCount": 6
+    },
+    {
+      "id": "r3-c4",
+      "source": "chapter",
+      "chapter": "e10",
+      "jp": "飲んで",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r3-a0",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "すぐに来てください。",
+      "total": 11.33,
+      "verdict": "conforms",
+      "issueCount": 5
+    },
+    {
+      "id": "r3-a1",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "日本語が上手になりたい。",
+      "total": 8.33,
+      "verdict": "needs-work",
+      "issueCount": 9
+    },
+    {
+      "id": "r3-a2",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "それは私の趣味です。",
+      "total": 11,
+      "verdict": "conforms",
+      "issueCount": 3
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Add polite-suffix conjugation forms (Masu/MasuPast/Masen/MasenDeshita) so ます/ました/ません(でした) stop being raw literals",
+      "rationale": "By far the most frequent issue in the sample: 4 distinct chapter items (r3-c0, r3-c1, r3-c2, r3-c3) and ~13 duplicate judge notes flag that ConjugateVerb<V,'Masu'> yields only the 連用形 stem (行き, 食べ, 入り, し), forcing the polite endings ます/ました/ませんでした to be appended as raw string literals. This is a genuine library gap, not authoring error. 'Masu' is also mislabelled (returns the stem, not the polite surface), which lets it be abused elsewhere (r3-a1 grabs the なり stem for たい). Fixing this raises D4 (and some D2/D6) across the entire polite-register corpus at once.",
+      "dimensions": [
+        "D4",
+        "D2",
+        "D6"
+      ],
+      "change": "In src/verb-types.d.ts extend ConjugationForm and the Godan/Ichidan/Irregular conjugation maps so the polite paradigm is fully expressible: keep a stem-only 連用形 form (e.g. add 'Renyoukei') and add fully-realized polite forms 'Masu' -> stem+ます, 'MasuPast' -> stem+ました, 'Masen' -> stem+ません, 'MasenDeshita' -> stem+ませんでした (plus the する/来る rows in IrregularConjugationMap: します etc.). Update the conjugation resolvers so VerbPart<V,'MasuPast'> resolves to e.g. 入りました with no trailing literal.",
+      "confidence": "high",
+      "frequency": 13
+    },
+    {
+      "target": "prompt",
+      "title": "Forbid SuffixPart for content words (な-adjectives, common nouns); reserve it for bound grammatical morphemes only",
+      "rationale": "Two HIGH-severity D1 misclassifications stem from SuffixPart being used as a catch-all: 上手 (a 形容動詞/な-adjective) tagged SuffixPart<'上手'> in r3-a1 (flagged by 3 judges), plus the SuffixPart fallback for ください. The library already has AdjectivePart<NaAdjective,...>, so 上手 as a suffix is a pure guidance failure. The current SuffixPart gloss ('auxiliaries/endings/formal nouns not otherwise modeled, e.g. た, まま, どおり') invites this drift. A sharpened rule prevents the whole class.",
+      "dimensions": [
+        "D1"
+      ],
+      "change": "In playground/scripts/annotate.ts tighten the SuffixPart line (~157) and hard rule (~197): SuffixPart is ONLY for bound/grammatical morphemes with no other constructor (た, まま, どおり, ～的, ～化) and NEVER for a free content word. Add: 'A な-adjective (上手, 便利, 静か) is NEVER SuffixPart — use AdjectivePart<NaAdjective{stem:...},\"Basic\">. A common noun is NEVER SuffixPart.'",
+      "confidence": "high",
+      "frequency": 4
+    },
+    {
+      "target": "prompt",
+      "title": "Require SuruVerb for サ変 compounds (勉強する) instead of CommonNoun + bare する",
+      "rationale": "r3-c1 (私は勉強しませんでした) was flagged HIGH D1 plus several D6 notes: 勉強する was modeled as CommonNoun<'勉強'> + separate IrregularVerb する, losing the single サ変-verb analysis even though SuruVerb<'勉強'> exists and is documented. The prompt mentions SuruVerb<'起動'> only in passing (rule ~190) without enforcing it, so the model defaults to splitting. Cheap systemic fix for every verbal-noun sentence.",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "change": "In annotate.ts hard rules, upgrade the SuruVerb mention (~190) to an imperative: 'Any noun+する compound (勉強する, 起動する, 確認する) MUST be a single SuruVerb<\"勉強\"> inside one VerbPart — never split into CommonNoun + IrregularVerb する.'",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add an adverbial/連用形 (に) form for な-adjectives so 上手に / 静かに is conjugable",
+      "rationale": "r3-a1 (日本語が上手になりたい) drew multiple D4/D6/D3 notes: AdjectiveConjugationForm has only Basic/Polite/Past/Negative/Te (confirmed in src/adjective-types.d.ts), with no adverbial 連用形 'に' form. This forces 上手 + に to be split with に mislabelled as a ParticlePart (D3 misanalysis) rather than expressed as an inflection. な-adjective + に + なる/する is a common pattern, so this lifts many future items.",
+      "dimensions": [
+        "D4",
+        "D6",
+        "D3"
+      ],
+      "change": "In src/adjective-types.d.ts add 'Adverbial' to AdjectiveConjugationForm and map it for NaAdjective to stem+に (上手 -> 上手に, 静か -> 静かに) and for IAdjective to the く form (早 -> 早く) to keep the union total. Then AdjectivePart<上手, 'Adverbial'> resolves to 上手に without a separate ParticlePart.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add noun-subclass-preserving parts (PronounPart / CommonNounPart / ProperNounPart) so the Sentence path keeps 代名詞 vs 普通名詞",
+      "rationale": "r3-a2 (それは私の趣味です) drew 3 D1 notes: the author correctly declared Pronoun<'それ'>, Pronoun<'私'>, CommonNoun<'趣味'> but had to wrap them in the POS-agnostic NounPart<N extends string>, which stores only a bare string and erases the pronoun/common-noun distinction. The rubric explicitly calls this a ts-def rootCause. Low severity but recurs whenever pronouns/proper nouns appear in the Sentence path.",
+      "dimensions": [
+        "D1"
+      ],
+      "change": "In src/phrase-types.d.ts make NounPart carry the subclass — either make it generic over the Noun union (NounPart<N extends Noun>) or add CommonNounPart/ProperNounPart/PronounPart members to PhrasePart that store the subclass tag while keeping value=string. Surface them in the annotate API_REFERENCE so それ -> PronounPart, 趣味 -> CommonNounPart.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "prompt",
+      "title": "Keep clause-connecting から (and other 接続助詞 after Te-form) as a visible ParticlePart instead of gluing it into a literal",
+      "rationale": "r3-c3 (手を洗ってから、食べます) drew several D3 notes: the connective 接続助詞 から is hard-coded as a raw template literal (ConjugateVerb<洗う,'Te'> + から), burying a 助詞. から is already in the Particle union, so this is a content/guidance slip, not a true ts-def gap — the cheap fix is a prompt rule. (The deeper ください/補助動詞 gap in r3-a0 is a separate, lower-priority ts-def item.)",
+      "dimensions": [
+        "D3"
+      ],
+      "change": "In annotate.ts hard rules add: 'A clause-connecting particle after a Te-form (から in 洗ってから, けど, ので) MUST be its own ParticlePart — never glued into a template literal after ConjugateVerb<V,\"Te\">.' Optionally, separately, add an AuxiliaryVerbPart (補助動詞) construct in src/phrase-types.d.ts for くださる/ください after a Te-form.",
+      "confidence": "medium",
+      "frequency": 2
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<入る,\"Masu\"> yields only the 連用形 stem 入り, so the polite past must be completed with a trailing ました literal. This is the documented library limitation, not an authoring error.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "まま is a 形式名詞/auxiliary left as a raw literal; the library has no dedicated constructor for it, so keeping it whole is honest and acceptable.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<入る,'Masu'> yields only the 連用形 stem 入り, so the trailing ました literal is required to reach 入りました; this is the documented library limitation, not a content error.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "まま (形式名詞 marking 'in the same state') is left as a raw literal; the library has no constructor for this formal-noun/grammatical element, so a literal is the honest choice.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<入る,\"Masu\"> yields only the 連用形 stem 入り, so the trailing ました literal is required to reach the polite past surface — a documented library limitation, not a content error.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "まま (形式名詞) is left as a raw literal; the library offers no dedicated formal-noun/connective construct, so this honest fixed-expression rendering is acceptable.",
+      "itemId": "r3-c0",
+      "jp": "靴を履いたまま入りました",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "勉強する is a サ変 compound verb; the library provides SuruVerb<\"勉強\"> to express it as one verb. Treating 勉強 as a standalone CommonNoun and する as a separate IrregularVerb loses the verbal-noun analysis. Should be ConjugateVerb<SuruVerb<\"勉強\">, \"Masu\">.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<...,\"Masu\"> yields only the 連用形 stem, and the library has no form for polite-past-negative ません/でした, so ませんでした must be a trailing literal — a known library limitation, not a content slip.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Given SuruVerb exists, using it (then the unavoidable ませんでした literal) would be the more idiomatic decomposition than splitting 勉強 + する.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ません/でした (polite negative past) cannot be produced by the conjugator — IrregularConjugationMap.する has only Masu=\"し\" with no polite-negative-past form, so the ending is a raw literal. Known library limitation per rubric.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "勉強する is a single サ変 verb with a dedicated SuruVerb<\"勉強\"> constructor; using CommonNoun 勉強 + separate IrregularVerb する is less idiomatic than the available SuruVerb path, though 勉強 alone is honestly a noun so the split is defensible.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "勉強する is a suru-verb; the library provides SuruVerb<\"勉強\"> (and example 勉強した = ConjugateVerb<SuruVerb<\"勉強\">, \"Ta\">). Modeling it as CommonNoun<勉強> + bare IrregularVerb する is a defensible noun+light-verb reading but diverges from the library's idiomatic single-unit suru-verb analysis.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> yields only the 連用形 stem (し), so the polite past-negative ませんでした must be appended as a raw literal; the library cannot express the negative-past auxiliary through the conjugator. Multi-morpheme ません+でした is collapsed into the literal as a side effect.",
+      "itemId": "r3-c1",
+      "jp": "私は勉強しませんでした",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Trailing ます literals are required because ConjugateVerb<V,\"Masu\"> returns only the 連用形 stem; this is the known library limitation, not an authoring error.",
+      "itemId": "r3-c2",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> yields only the 連用形 stem, so the trailing ます literals are required; this is the documented library limitation, not an authoring error.",
+      "itemId": "r3-c2",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> yields only the 連用形 stem (行き / 遅れ), so the polite ending is appended as a raw ます literal. Documented library limitation, not a content error.",
+      "itemId": "r3-c2",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The conjunctive particle から is hard-coded as a raw string literal (`${ConjugateVerb<洗う,\"Te\">}から`) rather than given its own visible particle unit. から is present in the library's Particle union, so it could have been attached via PhraseWithParticle; burying it in the template string hides a 助詞.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<食べる,\"Masu\"> yields only the 連用形 stem 食べ, so the trailing ます literal in 食べます is the known library limitation, not a content error.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<食べる,\"Masu\"> yields only the 連用形 stem 食べ, so the trailing ます literal is required to surface 食べます — a known library limitation, not a content fault.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The connective 接続助詞 から is appended as a raw template literal rather than via a particle constructor; the library has no type for clause-connecting から after a te-form. Visible and correct, but not modelled.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The conjunctive particle から (接続助詞 'after doing') is appended as a raw string literal after ConjugateVerb<洗う,\"Te\">から, so it is not a visible particle unit. The library has no Te+から sequential-action constructor, so this is a ts-def gap rather than an authoring slip.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<食べる,\"Masu\"> yields only the 連用形 stem 食べ, so the trailing ます literal is required to surface 食べます. This is the documented library limitation, not a content error.",
+      "itemId": "r3-c3",
+      "jp": "手を洗ってから、食べます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください is the imperative of the 補助動詞 下さる, not a 接尾辞; SuffixPart is a pragmatic stand-in because the library has no auxiliary/補助動詞 constructor to attach after a Te-form.",
+      "itemId": "r3-a0",
+      "jp": "すぐに来てください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "すぐに is sometimes lexicalized as a single 副詞 in dictionaries; splitting into すぐ + に is defensible and honest, but a single AdverbPart<\"すぐに\"> would also be acceptable. No error either way.",
+      "itemId": "r3-a0",
+      "jp": "すぐに来てください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください is the respectful imperative of the 補助動詞 くださる, not a 接尾辞. Tagging it SuffixPart<\"ください\"> misfiles a conjugated honorific auxiliary as a suffix. The library exposes no auxiliary-verb/補助動詞 construct (no ください/くださる support found in verb-types.d.ts), so a structured analysis is impossible; SuffixPart is actually cleaner than the raw-literal 〜ください pattern used in a01/e04.",
+      "itemId": "r3-a0",
+      "jp": "すぐに来てください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "すぐに could alternatively be analyzed as a single 副詞 (many dictionaries list すぐに as one adverb). The split すぐ + に is defensible (に as adverbializing particle) and favors decomposition, so this is a minor stylistic point, not an error.",
+      "itemId": "r3-a0",
+      "jp": "すぐに来てください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください is the imperative of the 補助動詞 くださる following the te-form; the library has no auxiliary-verb construct, so SuffixPart<\"ください\"> is the honest fallback. Minor: すぐに could alternatively be a single AdverbPart, but splitting into 副詞「すぐ」+助詞「に」 is a defensible school-grammar decomposition.",
+      "itemId": "r3-a0",
+      "jp": "すぐに来てください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "上手 (じょうず) is a な-adjective and should be AdjectivePart<NaAdjective{stem:\"上手\"}>, not SuffixPart<\"上手\">. SuffixPart hides the 形容動詞 POS entirely.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The に in 上手になる is the adverbial (連用形) inflection of the な-adjective 上手; the library's NaAdjective conjugation only produces で/です/etc. (via copula), not に, so に must be emitted separately. Tagging it as a ParticlePart is a defensible workaround given the ts-def gap.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Reaching the なり 連用形 stem for たい via VerbPart Masu relies on the documented Masu-stem limitation; honest but not how a teacher labels it (連用形 + 助動詞たい).",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "上手 is a な-adjective (形容動詞 / adjectival noun), a content word. It is tagged SuffixPart<\"上手\">, which is the wrong POS — 上手 is neither a suffix nor a plain noun. The library provides NaAdjective + AdjectivePart, so this is an authoring slip, not a library gap.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "上手に is properly the 連用形 (adverbial) form of the な-adjective 上手 used before なる. The library's NaAdjective forms (Basic/Polite/Past/Negative/Te) lack an adverbial/に form, so 上手に cannot be produced through the conjugator; splitting に out as a ParticlePart is the only available workaround but loses the adjectival-stem analysis.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "VerbPart<なる,\"Masu\"> is used to obtain the 連用形 stem なり as the mount point for たい, exploiting the documented behavior that Masu yields only the stem. The form name 'Masu' is semantically misleading here (this is 連用形+たい, not the polite ます form), a consequence of the library exposing no dedicated 連用形/desiderative form.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "上手 is a 形容動詞 (na-adjective) root tagged as SuffixPart<\"上手\">. SuffixPart denotes bound morphemes (e.g. ～的/～化); 上手 is a free na-adjective. Should be AdjectivePart with NaAdjective stem 上手, or at minimum NounPart, never SuffixPart.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The library's AdjectiveConjugationForm has no adverbial/連用形 (に) form for na-adjectives (only Basic な, Polite, Past, Negative, Te), so 上手に cannot be produced via ConjugateAdjective. This forces a raw literal split as 上手 + に instead of an AdjectivePart conveying the adverbial inflection.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "に in 上手に is the na-adjective adverbial (連用形) inflection, not the dative/locative particle, yet it is modeled as ParticlePart<\"に\">. Defensible given the ts-def gap above, but it mis-analyzes the morpheme's role.",
+      "itemId": "r3-a1",
+      "jp": "日本語が上手になりたい。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "それ/私 (代名詞) and 趣味 (普通名詞) are declared with Pronoun/CommonNoun aliases but then wrapped in the POS-agnostic NounPart in the Sentence path. Since Pronoun<N>/CommonNoun<N> are bare string aliases and NounPart only takes a string, the pronoun-vs-common-noun subclass is not preserved at the part level. No PronounPart/CommonNounPart exists, so the distinction cannot be expressed here.",
+      "itemId": "r3-a2",
+      "jp": "それは私の趣味です。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "それ, 私, and 趣味 are wrapped in NounPart, which is POS-agnostic and erases the noun subclass. The author declared Pronoun<\"それ\">, Pronoun<\"私\">, CommonNoun<\"趣味\"> but NounPart<N extends string> reduces them to bare strings, so the 代名詞 vs 普通名詞 distinction is not carried into the part. The Sentence path lacks a way to preserve noun subclass.",
+      "itemId": "r3-a2",
+      "jp": "それは私の趣味です。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "それ and 私 are Pronoun and 趣味 is CommonNoun, but each is wrapped in NounPart, which only stores a string ('value: N') and discards the pronoun/common-noun POS subclass. The typed aliases are correct, yet the Sentence part list cannot carry that distinction through NounPart.",
+      "itemId": "r3-a2",
+      "jp": "それは私の趣味です。",
+      "source": "annotate"
+    }
+  ]
+}

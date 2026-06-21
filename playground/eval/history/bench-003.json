@@ -1,0 +1,617 @@
+{
+  "round": 3,
+  "sampled": 12,
+  "scored": 12,
+  "roundScore": 0.8981,
+  "byDimension": {
+    "D1": 0.944,
+    "D2": 0.875,
+    "D3": 0.806,
+    "D4": 0.861,
+    "D5": 1,
+    "D6": 0.903
+  },
+  "perItem": [
+    {
+      "id": "b3-0",
+      "source": "benchmark",
+      "chapter": "e01",
+      "jp": "私は学生です",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "b3-1",
+      "source": "benchmark",
+      "chapter": "i05",
+      "jp": "すぐ参ります",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 1
+    },
+    {
+      "id": "b3-2",
+      "source": "benchmark",
+      "chapter": "i14",
+      "jp": "行きますが遅れます",
+      "total": 11.67,
+      "verdict": "conforms",
+      "issueCount": 2
+    },
+    {
+      "id": "b3-3",
+      "source": "benchmark",
+      "chapter": "e08",
+      "jp": "昨日は寒かった",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 1
+    },
+    {
+      "id": "b3-4",
+      "source": "benchmark",
+      "chapter": "a12",
+      "jp": "言語は文化である",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "b3-5",
+      "source": "benchmark",
+      "chapter": "e19",
+      "jp": "コーヒーを飲もう",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "b3-6",
+      "source": "benchmark",
+      "chapter": "i08",
+      "jp": "早く寝るようにしてください",
+      "total": 7.67,
+      "verdict": "needs-work",
+      "issueCount": 10
+    },
+    {
+      "id": "b3-7",
+      "source": "benchmark",
+      "chapter": "i06",
+      "jp": "読めば読むほど面白い",
+      "total": 11.67,
+      "verdict": "conforms",
+      "issueCount": 2
+    },
+    {
+      "id": "b3-8",
+      "source": "benchmark",
+      "chapter": "a03",
+      "jp": "今日は休むわけにはいきません",
+      "total": 11,
+      "verdict": "conforms",
+      "issueCount": 5
+    },
+    {
+      "id": "b3-9",
+      "source": "benchmark",
+      "chapter": "e17",
+      "jp": "今日は来なくてもいいです",
+      "total": 6.33,
+      "verdict": "needs-work",
+      "issueCount": 12
+    },
+    {
+      "id": "b3-10",
+      "source": "benchmark",
+      "chapter": "a12",
+      "jp": "知らぬ人に声をかけられた",
+      "total": 11.33,
+      "verdict": "conforms",
+      "issueCount": 5
+    },
+    {
+      "id": "b3-11",
+      "source": "benchmark",
+      "chapter": "i10",
+      "jp": "本当のことを言うべきだ",
+      "total": 9.67,
+      "verdict": "needs-work",
+      "issueCount": 7
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Remove adjective 連用形 examples (早く/本当に/一緒に) from the Adverb doc comment",
+      "rationale": "adverb-types.d.ts line 19 lists 早く, 本当に, 一緒に as Adverb examples, while adjective-types.d.ts already gives 早く as the IAdjective Adverbial (く) example. This contradictory guidance directly causes authors/annotator to type 早く as Adverb<\"早く\"> instead of ConjugateAdjective<早い,\"Adverbial\">, which the rubric explicitly forbids. Fixing the single source comment removes the root incentive for the most-repeated D1 error.",
+      "dimensions": [
+        "D1",
+        "D2"
+      ],
+      "change": "Edit src/adverb-types.d.ts line ~19: change the example list to genuine lexical adverbs only (e.g. 毎日, すぐ, また, とても, ちょっと); delete 早く, 本当に, 一緒に since those are adjective/na-adjective 連用形 forms produced by ConjugateAdjective Adverbial / な-adj に.",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "prompt",
+      "title": "Hard rule: 連用形 of i-/na-adjectives (早く/本当に/静かに) must use the conjugator, never Adverb",
+      "rationale": "Reinforces the ts-def comment fix at generation time. Multiple judges flagged 早く as Adverb (high severity, D1). The annotate prompt should state that only genuine lexical adverbs use Adverb<>, and adjective 連用形 (く / に forms) must come from ConjugateAdjective<...,\"Adverbial\"> or the na-adjective adverbial に. Highest-frequency systemic error; a prompt rule generalizes beyond the one logged item.",
+      "dimensions": [
+        "D1",
+        "D2"
+      ],
+      "change": "In playground/scripts/annotate.ts add a hard rule: 'Never tag 早く/速く/本当に/一緒に/静かに as Adverb. These are adjective 連用形; use ConjugateAdjective<Adj,\"Adverbial\"> for i-adjectives (く) and the adverbial に for na-adjectives. Adverb<> is only for true lexical 副詞 (毎日, すぐ, また).'",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add negative-te / なくて derivation so negative te-forms and てもいい come from the conjugator",
+      "rationale": "Item b3-9 (来なくてもいい) drew the largest cluster of high-severity D2/D3/D4 issues: ConjugateVerb<来る,\"Nai\"> returns bare stem 来, and なくても is a frozen literal burying the concessive particle も. The library has no Nakute (negative-te) form, so a teachable, fully-modellable pattern is forced into a literal. Adding a Nakute form lets authors write ${ConjugateVerb<V,\"Nakute\">} then attach も as a typed particle, fixing D2/D3/D4 together for a whole grammar family.",
+      "dimensions": [
+        "D2",
+        "D3",
+        "D4"
+      ],
+      "change": "In src/verb-types.d.ts add a \"Nakute\" (and ideally a full \"Nai\"→…ない) form to VerbConjugationForm and the resolver so godan/ichidan/irregular produce 未然形+なくて (来→来なくて, 食べ→食べなくて, 読ま→読まなくて).",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add a Provisional (…ば) verb form so 読めば is conjugator-driven",
+      "rationale": "b3-7 (読めば読むほど) emits ば as a raw literal because only the Hypothetical stem (め/け) exists with no bundled provisional form. A dedicated Provisional form (仮定形+ば) makes the conditional fully conjugator-driven (D4) instead of hand-glued. Lower frequency but a clean, contained library addition.",
+      "dimensions": [
+        "D4"
+      ],
+      "change": "In src/verb-types.d.ts add a \"Provisional\" form to VerbConjugationForm resolving to 仮定形+ば (godan 読→読めば, ichidan 食べ→食べれば, する→すれば, 来る→来れば).",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "prompt",
+      "title": "Rule: stack particles via nested PhraseWithParticle so every 助詞 (には/ても/わけには) is a visible unit",
+      "rationale": "Recurring low/high D3 issues across b3-2 (が), b3-8 (には), b3-9 (ても), b3-11 (の): particles are inlined as raw template literals because PhraseWithParticle takes only one particle, so double particles (に+は) and clause connectives get hardcoded. A prompt rule to chain PhraseWithParticle (or append ParticlePart) for each particle, including stacked ones, surfaces every 助詞 as a typed node with no library change.",
+      "dimensions": [
+        "D3"
+      ],
+      "change": "In annotate.ts add a rule: 'Every 助詞 must be a typed unit. For stacked particles (には, では, ても) nest PhraseWithParticle (e.g. PhraseWithParticle<PhraseWithParticle<X,\"に\">,\"は\">) or append ParticlePart; never write a bare particle literal between units. Surface clause connectives が/けど likewise.'",
+      "confidence": "medium",
+      "frequency": 4
+    },
+    {
+      "target": "prompt",
+      "title": "Rule: split modellable copula だ out of classical-auxiliary literals (べきだ → べき + Copula)",
+      "rationale": "b3-11 (言うべきだ) flagged high D3/D4: べきだ fuses the genuinely-unmodelable classical べき with the modern copula だ, which the library DOES model via Copula/ConjugateCopula<\"Plain\">. A prompt rule to never bundle a modellable copula into a classical-form literal surfaces だ as a typed unit and generalizes to other classical+copula tails.",
+      "dimensions": [
+        "D2",
+        "D4"
+      ],
+      "change": "In annotate.ts add a rule: 'Classical auxiliaries (べき, ぬ, ざる) may stay as literals, but a following modern copula だ/です must be emitted separately via Copula<\"Plain\">/ConjugateCopula, e.g. べき${Copula<\"Plain\">}, not the literal べきだ.'",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "content",
+      "title": "Fix b3-6: model 早く as ConjugateAdjective<早い,\"Adverbial\"> and surface に in ように",
+      "rationale": "Highest-severity single item, flagged repeatedly (D1 high, D2, D3). 早く must be the i-adjective 早い Adverbial, not Adverb<\"早く\">. Even after the systemic comment/prompt fixes, this already-authored snippet needs correcting; ください and よう are defensibly whole, but the 早く slip and buried に should be fixed.",
+      "dimensions": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "change": "In the chapter file containing 早く寝るようにしてください, replace Adverb<\"早く\"> with ConjugateAdjective over IAdjective {stem:\"早\";ending:\"い\"} at \"Adverbial\"; optionally surface に as a ParticlePart within ように.",
+      "confidence": "high",
+      "frequency": 1
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "参る is humble/謙譲語; the library has no honorific-register marker, so the humble nuance is lost. Morphologically godan is correct, so this is a library expressiveness gap, not an error.",
+      "itemId": "b3-1",
+      "jp": "すぐ参ります",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The contrastive conjunctive particle が is embedded as a raw literal in the template string rather than represented as a distinct typed particle/connective unit; the library offers no clean construct to attach a clause-level が between two conjugated verbs, so it must be hardcoded.",
+      "itemId": "b3-2",
+      "jp": "行きますが遅れます",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The clause-connecting particle が is expressed as a raw string literal rather than a typed Particle/Conjunction constructor; acceptable given the library exposes no particle type, but it is structurally an untyped unit.",
+      "itemId": "b3-2",
+      "jp": "行きますが遅れます",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "寒い is declared as IAdjective & { stem; ending } omitting the type: \"i-adjective\" discriminant present in the library's IAdjective shape; harmless since the intersection still extends IAdjective and ConjugateAdjective resolves, but the canonical object literal would include type. Stylistic only.",
+      "itemId": "b3-3",
+      "jp": "昨日は寒かった",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "早く is modeled as Adverb<\"早く\"> but it is the 連用形(Adverbial) of i-adjective 早い. The library already provides ConjugateAdjective with an Adverbial form whose own comment example is 早く, so the correct expression is ConjugateAdjective<早い,\"Adverbial\">. Rubric explicitly forbids treating 早く as a lexical adverb.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "早く collapsed into a single leaf hides the 早い+く morphology.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください left as a raw literal; くださる imperative/request is not modeled by the conjugator, so the request ending is not derived. Borderline-fixed but ideally library-supported.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ように left as a literal buries the purpose particle に; ように is a defensible fixed grammatical chunk but the particle is not a visible unit.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "早く is typed as Adverb<\"早く\"> but it is the 連用形 (Adverbial form) of the i-adjective 早い. Should be IAdjective {stem:\"早\";ending:\"い\"} conjugated to Adverbial (く). Library already supports this; rubric explicitly disallows treating 早く as a lexical adverb.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The particle に in ようにする is buried inside the literal \"ように\". The に should be a visible particle unit; よう is a formal noun/auxiliary that could be separated.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "してください leaves ください as a bare literal; while the auxiliary くださる imperative is a fixed polite-request form, the prompt could guide consistent decomposition of the よう+に+する+くれ structure.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "早く should be ConjugateAdjective<早い & IAdjective, \"Adverbial\"> (連用形 く), not Adverb<\"早く\">. The library already supports this (adjective-types.d.ts line 25/35 explicitly use 早く as the Adverbial example), so it is an authoring slip, not a missing capability.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Contradictory library guidance: adverb-types.d.ts lists 早く as an Adverb example while adjective-types.d.ts lists 早く as the i-adjective Adverbial example. This invites the wrong choice; the adverb comment should drop 早く/本当に.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The particle に in ように is buried in the literal. Acceptable as a fixed pattern, but a fuller analysis would surface に as a particle unit.",
+      "itemId": "b3-6",
+      "jp": "早く寝るようにしてください",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ば is appended as a raw literal because the library exposes only the Hypothetical 仮定形 stem (め) with no combined provisional/conditional form bundling ば. Acceptable since ば is a separable particle, but a dedicated Provisional (読めば) form would make the conjugation fully conjugator-driven.",
+      "itemId": "b3-7",
+      "jp": "読めば読むほど面白い",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "ば and especially ほど (副助詞) are emitted as raw template literals rather than typed particle units. ば is a defensible inseparable part of the 仮定形 conditional, but ほど is an independent particle that ideally would be surfaced via a particle constructor; the flat-template i-chapter convention leaves it as a literal.",
+      "itemId": "b3-7",
+      "jp": "読めば読むほど面白い",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The contrastive/topic は in わけには is written as a bare literal `は` in the template string instead of being expressed as a typed particle unit (e.g. attached via PhraseWithParticle or an equivalent particle constructor), so this 助詞 is not a visible typed unit. All other particles (は, に) are properly modeled, so this is a one-off authoring slip rather than a missing library capability.",
+      "itemId": "b3-8",
+      "jp": "今日は休むわけにはいきません",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "わけ is a 形式名詞 (formal/dependent noun) rather than a fully independent common noun; CommonNoun is acceptable but a dedicated formal-noun subclass would be more precise if one existed.",
+      "itemId": "b3-8",
+      "jp": "今日は休むわけにはいきません",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "The focus particle は in わけには is a bare string literal between PhraseWithParticle<わけ,\"に\"> and the verb, rather than a visible particle unit. PhraseWithParticle takes a single particle, so stacking に+は (double particle には) cannot be expressed as one unit; prompt/lib could guide chaining a second PhraseWithParticle or a particle-cluster type so every 助詞 is a first-class node.",
+      "itemId": "b3-8",
+      "jp": "今日は休むわけにはいきません",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "今日 as CommonNoun is acceptable; some teachers tag time words like 今日 as a 名詞/時相名詞 which CommonNoun adequately covers, so no real defect.",
+      "itemId": "b3-8",
+      "jp": "今日は休むわけにはいきません",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The contrastive/topic は in 「にはいきません」is written as a raw literal 'は' between PhraseWithParticle<わけ,\"に\"> and the verb, instead of being modeled as a particle unit. Could be expressed by stacking particles, e.g. nesting another PhraseWithParticle or wrapping the に-phrase then appending は as a typed Particle.",
+      "itemId": "b3-8",
+      "jp": "今日は休むわけにはいきません",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "ConjugateVerb<来る,\"Nai\"> resolves to just 来 (stem), and the negative auxiliary is supplied as a raw literal なくても. The negative form ない/なく is modellable (IAdjective-like く/くて inflection) and must come from the conjugator, not a literal.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The concessive particle も in the てもいい construction is hidden inside the literal なくても; it should be a visible particle unit (e.g., PhraseWithParticle on 来なくて with も).",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "来 + なくても collapses three morphemes (ない negative + て + も) into one undecomposed literal span.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The library has no constructor for the negative-te (なくて) form nor for the てもいい (permission/no-obligation) auxiliary pattern, forcing authors toward a literal; a NegativeTe form or an auxiliary phrase type would let this be modeled correctly.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "Library has no negative-te (Nakute) form; only Nai (来→bare stem) exists, so 来なくて cannot be produced by the conjugator and must be hand-written as a literal.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The particle も is embedded inside the literal \"なくても\" instead of being a visible unit; no particle constructor is applied to it. Partly forced because there is no negative-te form to attach it to.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "なくても merges negative なく + て + も into one leaf; even given ts-def limits, the literal could at minimum be split (e.g. なくて + も) to surface the particle.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "来る is declared with {dictionary:\"来る\"} which type-checks (matches the library example) but causes ConjugateVerb to widen to <any,\"Nai\">; harmless here since it still resolves to 来, but it indicates the irregular verb is not narrowed.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "ConjugateVerb<来る,'Nai'> resolves to bare 来 (the negative base), not the documented 来ない; the author leans on this to glue a literal なくても, so the negative te-form is faked rather than conjugated.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "なくても is a collapsed literal hiding なく(ない 連用形)+て+も. The library has no Negative-Te / なくて form, so the negative te-form cannot be produced; only bare stem (Nai) is available, forcing the literal.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The concessive particle も is buried in the 'なくても' literal instead of being a visible particle unit; no constructor exists for ても concession on a negative te-form.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "なくてもいい is a standard teachable grammar pattern, not an unmodelable classical form; lacking a negative-te + も path the snippet must under-segment it as a frozen literal.",
+      "itemId": "b3-9",
+      "jp": "今日は来なくてもいいです",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The plain past た is appended as a raw literal to the passive stem かけられ. Ideal would be a single conjugator call, but the library cannot chain Passive+Ta, so a literal た is the only available means. Result is correct.",
+      "itemId": "b3-10",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Past た on the passive is glued as a raw literal (`${ConjugateVerb<かける,\"Passive\">}た`) because ConjugateVerb cannot compose Passive then Ta in one call; the passive stem itself is correctly from the conjugator. A composable past-on-passive path would let this be fully modeled.",
+      "itemId": "b3-10",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Classical negative ぬ appended as a literal after 未然形 知ら. This is the explicitly allowed treatment for classical ぬ, but the library has no native classical-negative form, so it must be a literal tail.",
+      "itemId": "b3-10",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Past tense た on the passive かけられ is appended as a raw literal because the conjugator cannot chain Passive+Ta in one ConjugateVerb call; ideally the passive-past would be produced by the conjugator (かけられる → Ta), not by string concatenation.",
+      "itemId": "b3-10",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "知らぬ relies on ConjugateVerb<知る,'Nai'> returning the bare 未然形 知ら then appending classical ぬ; this is correct and rubric-sanctioned, but worth noting the ぬ auxiliary is unmodelable so the literal is justified rather than ideal.",
+      "itemId": "b3-10",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "べきだ is a single raw literal that bundles the classical 連体形 べき with the copula だ. べき is legitimately unmodelable (classical 助動詞 べし), but だ is the modern copula and the library provides Copula/ConjugateCopula<\"Plain\">; it should be `べき${ConjugateCopula<\"Plain\">}` so the copula is a visible, conjugator-driven unit.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The だ copula is hidden inside the べきだ literal rather than split out as its own morpheme.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "本当 is borderline: it is also a na-adjective (本当だ/本当に). CommonNoun is acceptable in the 本当の genitive construction, but a NaAdjective stem reading is equally arguable; not wrong, just noting the ambiguity.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "べきだ bundles the classical auxiliary べき with the copula だ in one literal. べき is genuinely unmodelable (classical 連体形, allowed by rubric), but だ is a separable copula; the library offers no constructor for べき, so collapsing them is the only practical option. Consistent with the rest of chapter i10.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Genitive particle の is embedded as a string literal in `${本当}の${こと}` instead of a visible particle unit; could have used a second PhraseWithParticle/ParticlePart with \"の\".",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Copula だ is a raw literal; ConjugateCopula/Copula exist to model だ. Could append `${Copula<\"Plain\">}` after べき instead of the literal だ.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "べきだ collapsed into one literal; while classical べき is acceptable whole, fusing the modellable copula だ into it hides structure. Prompt should guide splitting modellable copula from the classical auxiliary.",
+      "itemId": "b3-11",
+      "jp": "本当のことを言うべきだ",
+      "source": "benchmark"
+    }
+  ]
+}

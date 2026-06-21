@@ -1,0 +1,591 @@
+{
+  "round": 2,
+  "sampled": 8,
+  "scored": 8,
+  "roundScore": 0.8299,
+  "byDimension": {
+    "D1": 0.833,
+    "D2": 0.771,
+    "D3": 0.771,
+    "D4": 0.875,
+    "D5": 1,
+    "D6": 0.729
+  },
+  "perItem": [
+    {
+      "id": "r2-c0",
+      "source": "chapter",
+      "chapter": "i14",
+      "jp": "行きますが遅れます",
+      "total": 9,
+      "verdict": "needs-work",
+      "issueCount": 8
+    },
+    {
+      "id": "r2-c1",
+      "source": "chapter",
+      "chapter": "i05",
+      "jp": "私がいたします",
+      "total": 11.67,
+      "verdict": "conforms",
+      "issueCount": 4
+    },
+    {
+      "id": "r2-c2",
+      "source": "chapter",
+      "chapter": "e14",
+      "jp": "ここに入ってはいけません",
+      "total": 5.33,
+      "verdict": "needs-work",
+      "issueCount": 12
+    },
+    {
+      "id": "r2-c3",
+      "source": "chapter",
+      "chapter": "a01",
+      "jp": "社長が本をお読みになります",
+      "total": 9.67,
+      "verdict": "needs-work",
+      "issueCount": 7
+    },
+    {
+      "id": "r2-c4",
+      "source": "chapter",
+      "chapter": "e13",
+      "jp": "友達とお茶を飲んだ",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r2-a0",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "彼は有名な先生です。",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 2
+    },
+    {
+      "id": "r2-a1",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "りんごを三つください。",
+      "total": 9.33,
+      "verdict": "needs-work",
+      "issueCount": 9
+    },
+    {
+      "id": "r2-a2",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "二人で映画を見ました。",
+      "total": 10.67,
+      "verdict": "conforms",
+      "issueCount": 5
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Make ConjugateVerb<V,\"Masu\"> emit the full polite ます form, not just the 連用形 stem",
+      "rationale": "By far the most frequent systemic complaint (~10 issues across r2-c0, r2-c1, r2-c3, plus the いけません negative-polite tail in r2-c2). The form is documented as the 'Polite form' yet every branch (Godan stem + map, Ichidan `${stem}`, irregular, Suru) returns only the 連用形 masu-stem (行き / いたし / なり / 食べ). Authors are forced to hand-spell ます as a raw literal, which cascades into D3 (connective が buried in `ますが`), D2 (clause structure flattened into one template literal), and D6 failures. Fixing the conjugator to append ます removes the root cause of the largest issue cluster at once.",
+      "dimensions": [
+        "D4",
+        "D6",
+        "D3",
+        "D2"
+      ],
+      "change": "In src/verb-types.d.ts, change the Masu branches in ConjugateVerb so Masu resolves to stem+ます: Godan `${V[\"stem\"]}${GetGodanConjugation<...,\"Masu\">}ます`, Ichidan `${V[\"stem\"]}ます`, Suru/irregular append ます to the masu-stem. If existing snippets rely on the bare stem, instead ADD a new form (e.g. \"MasuStem\" for the 連用形 and keep/repoint \"Masu\" to the full polite form), and update the ConjugationForm union + GodanConjugationMap comments accordingly. Then update line 269's doc test expectation (話すMasu → \"話します\").",
+      "confidence": "high",
+      "frequency": 11
+    },
+    {
+      "target": "ts-def",
+      "title": "Add NumeralPart / CounterPart so counter expressions (三つ, 二人) aren't hidden in NounPart",
+      "rationale": "Second-largest cluster (~7 issues, r2-a1 三つ and r2-a2 二人), all flagged ts-def by the rubric NOTE: NounPart is POS-agnostic, so native numeral+counter words are indistinguishable from plain 普通名詞, losing their 数詞 status. The Sentence<[...]> path has no way to express a numeral/counter, so this misrepresentation is currently unavoidable. A dedicated part type lets the annotator tag these correctly.",
+      "dimensions": [
+        "D1",
+        "D2",
+        "D6"
+      ],
+      "change": "In src/phrase-types.d.ts add NumeralPart<N extends string> (type:\"numeral\") and CounterPart<Num extends string, Counter extends string> (value = `${Num}${Counter}`, type:\"counter\"), include them in the PhrasePart union, then add both to the API_REFERENCE parts list and allow-list in playground/scripts/annotate.ts with a hard rule: native counter expressions (三つ, 二人, 一冊…) MUST be CounterPart, never NounPart.",
+      "confidence": "high",
+      "frequency": 7
+    },
+    {
+      "target": "ts-def",
+      "title": "Preserve noun subclass in the Sentence path (CommonNounPart / ProperNounPart / PronounPart)",
+      "rationale": "Recurring ts-def cluster (~4 issues: r2-a0 彼/先生, r2-a1 りんご, r2-a2 映画). NounPart<N extends string> erases the common/proper/pronoun distinction — Pronoun<\"彼\"> and CommonNoun<\"先生\"> both flatten to {type:\"noun\"}, with intent surviving only in alias names. The library exposes CommonNoun/ProperNoun/Pronoun constructors but no part-level wrapper that records which one, so the subclass cannot be expressed in the Sentence path.",
+      "dimensions": [
+        "D1"
+      ],
+      "change": "In src/phrase-types.d.ts either add a `subclass` discriminant to NounPart (NounPart<N, Sub extends \"common\"|\"proper\"|\"pronoun\" = \"common\">) or add CommonNounPart/ProperNounPart/PronounPart wrappers (value = the noun string). Update the PhrasePart union, then update API_REFERENCE in annotate.ts to direct names→ProperNounPart, これ/私/彼→PronounPart, ordinary nouns→CommonNounPart.",
+      "confidence": "medium",
+      "frequency": 4
+    },
+    {
+      "target": "prompt",
+      "title": "Forbid template-literal/concatenation snippets; require the Sentence<[...]> parts path",
+      "rationale": "Two chapter snippets (r2-c0 行きますが遅れます, r2-c2 ここに入ってはいけません) compose by raw template-literal concatenation instead of Sentence<[...parts]>, burying particles (が, に, は) inside literals (D3 high) and collapsing clause/morpheme structure (D2 high), and embedding ここ as a literal instead of Pronoun (D1). The annotate prompt already discourages NounPhrase/template glue and the validator rejects it for generated output, but chapter content predates/bypasses this. Strengthening the prompt rule (and noting it applies to authored chapters) raises both items and prevents regressions.",
+      "dimensions": [
+        "D3",
+        "D2",
+        "D1"
+      ],
+      "change": "In playground/scripts/annotate.ts hard rules, tighten the existing rule to: every input particle (は,が,を,に,…) AND demonstrative pronoun (ここ/そこ/これ) must surface as its own typed part; never bury a particle or pronoun inside a multi-character literal or template string. Add an explicit example: ここに入ってはいけません → PronounPart<\"ここ\">, ParticlePart<\"に\">, VerbPart<入る,\"Te\">, ParticlePart<\"は\">, SuffixPart<\"いけません\">.",
+      "confidence": "high",
+      "frequency": 2
+    },
+    {
+      "target": "ts-def",
+      "title": "Add a conjunctive/contrastive が to the Particle union (or document the connective-が path)",
+      "rationale": "r2-c0 (行きますが遅れます): the clause-connecting 接続助詞 が is buried as a raw literal because the Particle union defines が only as the subject marker; there is no typed unit for connective が (the union has けど/のに but not connective が). Lower frequency than the Masu/numeral clusters but a real D3 gap once snippets move to the parts path.",
+      "dimensions": [
+        "D3",
+        "D2"
+      ],
+      "change": "が is already in the Particle union (src/phrase-types.d.ts line 24) so it CAN be emitted as ParticlePart<\"が\">; the gap is guidance. Update the comment for が to note it covers both subject-marker and contrastive/clause-connective uses, and add a prompt note that clause-joining が must be ParticlePart<\"が\">, not a literal. No new union member needed.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "content",
+      "title": "Rewrite the two literal-string chapter snippets to the parts path",
+      "rationale": "Concrete one-off fixes that, combined with the prompt rule above, close the D3/D2/D6 failures in r2-c0 and r2-c2 immediately rather than waiting on regeneration. Depends on the Masu ts-def fix (for ます) and connective-が guidance for the cleanest result.",
+      "dimensions": [
+        "D3",
+        "D2",
+        "D6"
+      ],
+      "change": "Locate the snippets for 行きますが遅れます and ここに入ってはいけません under playground/src/tutorial/chapters/ and rewrite each as Sentence<[...]>: clause1 VerbPart<行く,\"Masu\"> + ParticlePart<\"が\"> + VerbPart<遅れる,\"Masu\">; and PronounPart/NounPart<\"ここ\"> path + ParticlePart<\"に\"> + VerbPart<入る,\"Te\"> + ParticlePart<\"は\"> + SuffixPart<\"いけません\"> (or modelled いける negative-polite once available).",
+      "confidence": "medium",
+      "frequency": 2
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The conjunctive particle が is hidden inside the raw literal `ますが`. が exists in the library's Particle type and could have been emitted as a visible ParticlePart<\"が\">; the snippet instead concatenates everything as a template string, so the particle has no integrity.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The Masu conjugation only yields the 連用形 masu-stem (行き / 遅れ); the full polite ます ending cannot be produced by the conjugator, forcing the author to hand-spell ます as a raw literal.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The sentence is composed purely by template-literal concatenation rather than the Sentence<[VerbPart, ParticlePart, ...]> path, so the two-clause structure and the joining particle are not expressed as discrete units.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The clause-connecting/contrastive 接続助詞 が is buried as a raw literal in the template. The library's Particle union only defines が as the subject marker and has no conjunctive が (it has けど/のに but not connective が), so there is no typed unit to express it.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> returns only the masu-stem (連用形), e.g. 行き/遅れ, not the full polite 行きます/遅れます. The author appends ます as a raw literal; the library cannot produce the complete polite form, so the inflectional auxiliary ます is spelled rather than modelled.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "No clause-combining construct (e.g. Sentence<[...]> joining two predicates with a conjunctive particle) is used; the two clauses plus が plus both ます are flattened into a single template literal, so the connective structure is not represented.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> deliberately returns only the stem (行き/遅れ), so the polite ます auxiliary must be hand-appended as a literal; the library has no form that yields the full 行きます, making the conjugator unable to express the polite ending it is named for.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "The contrastive conjunctive particle が is a raw literal in the template; the library exposes が in the Particle union and a Sentence/ParticlePart path, so it could have been a typed unit. Acceptable in the template-literal style, but a typed-particle composition would be more faithful.",
+      "itemId": "r2-c0",
+      "jp": "行きますが遅れます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The library's \"Masu\" form is documented as the 'Polite form' but actually evaluates only to the 連用形 stem (いたし), forcing the author to append the polite auxiliary ます as a raw string literal. There is no constructor for the full polite/ます-form, so the polite inflection cannot be expressed through the conjugator. This is a library gap, not an authoring slip; the resulting Japanese is correct.",
+      "itemId": "r2-c1",
+      "jp": "私がいたします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<V,\"Masu\"> resolves to the 連用形 stem (いたし) only, so the polite suffix ます must be appended as a raw string literal. The library has no form name that yields the full polite いたします, forcing an inflectional morpheme outside the conjugator.",
+      "itemId": "r2-c1",
+      "jp": "私がいたします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "いたす is the humble (謙譲語) counterpart of する; modeling it as a plain GodanVerb is morphologically correct for conjugation but loses the honorific-register relationship to する. Acceptable, noted only for completeness.",
+      "itemId": "r2-c1",
+      "jp": "私がいたします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The polite auxiliary ます is appended as a raw literal because the library has no ます auxiliary type; Masu only yields the renyokei stem. This is the codebase-wide established pattern, not an authoring slip.",
+      "itemId": "r2-c1",
+      "jp": "私がいたします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles に and は are buried inside raw literals ここに and はいけません instead of being separate visible units. Should be composed via a Sentence/particle path.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "ここに and はいけません are opaque string chunks; ここ (pronoun) and the auxiliary いける(negative polite いけません) hide internal structure that the library could decompose.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "いけません is a modellable inflection (Godan/Ichidan いける + negative polite ません) but is hardcoded as a raw literal; the analysis only conjugates 入る and leaves the rest as text.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ここ should be a Pronoun/demonstrative constructor rather than embedded in a literal.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "prompt",
+      "note": "Particles に (in ここに) and は (in はいけません) are buried in raw template literals though both are in the Particle union; a Sentence/parts composition with PronounPart + ParticlePart would surface them.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "prompt",
+      "note": "ここに and はいけません collapsed into raw literals; ここ+に at minimum should be decomposed. The template-literal approach hides structure the library can express.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "ここ is a pronoun (代名詞) but written as a literal, so its POS is not encoded.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The てはいけません prohibition auxiliary (は + いけません, polite negative potential of いける) has no dedicated constructor, so spelling いけません raw is partly forced; only verb-internal inflection is modellable.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "prompt",
+      "note": "Particles に and は are embedded in raw template literals ('ここに', 'はいけません') instead of being broken out via the Sentence/Particle path; they should be visible units.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "prompt",
+      "note": "The sentence is not decomposed: ここ (pronoun) and the negative-polite verb いけません are frozen into literals; only the Te-form constructor is used. A Sentence<[...]> composition would expose the morphemes.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "いけません (いける ichidan, negative polite ません) is hand-spelled. The library can express Ichidan Masu/Nai stems but lacks a polite-negative (ません) form, so the negative ending is a raw literal of necessity.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "Treating the entire はいけません tail as one literal over-collapses; the honest analysis is the てはいけません grammar pattern wrapping an analyzable verb plus particle.",
+      "itemId": "r2-c2",
+      "jp": "ここに入ってはいけません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "になります is a raw literal; なる is a regular godan verb whose Masu form (なり+ます) the library can express via ConjugateVerb, so the inflection should be modeled rather than hardcoded.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The になります chunk hides the なる verb + ます auxiliary boundary; honest decomposition would surface なる as a verb leaf.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Keeping the お〜になる honorific frame is reasonable, but the final verbal inflection being a literal lowers idiomatic fidelity since it is modellable.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "になります is a raw literal because the conjugator's Masu form yields only the renyoukei stem (なり) and never appends ます, so なる→なります cannot be modelled; the literal scaffold is justified, not a content slip.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "なります is spelled as a raw literal instead of conjugating the auxiliary なる (GodanVerb stem な, ending る) to its Masu form. The library can model this, so the inflection should flow through ConjugateVerb.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The に particle in the お〜になる honorific construction is hidden inside the literal \"になります\"; it should be a visible particle unit between 読み and なる.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The honorific scaffold になります collapses particle に + conjugated verb なる into a single opaque literal chunk.",
+      "itemId": "r2-c3",
+      "jp": "社長が本をお読みになります",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Both 彼 (Pronoun) and 先生 (CommonNoun) are wrapped in POS-agnostic NounPart<string>, which flattens the noun subclass at the part level; intent is preserved only in the alias names. Library has no PronounPart/CommonNounPart distinction in the Sentence path.",
+      "itemId": "r2-a0",
+      "jp": "彼は有名な先生です。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "NounPart<N extends string> erases the noun subclass: Pronoun<\"彼\"> and CommonNoun<\"先生\"> are plain string aliases, so the part chain records value \"彼\"/\"先生\" with type:\"noun\" and loses the pronoun-vs-common distinction. Constructor choice at the alias level is correct, so this is a library limitation, not an authoring error.",
+      "itemId": "r2-a0",
+      "jp": "彼は有名な先生です。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "三つ is a numeral with the general counter つ but is forced into NounPart, hiding its numeral/counter status. The library exposes no NumeralPart or CounterPart, so the correct POS cannot be expressed in the Sentence<[...]> path.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください is the irregular imperative of くださる but is written as a frozen SuffixPart literal; there is no くださる conjugation entry in the library, so the inflection cannot be produced via the conjugator.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Overall segmentation is idiomatic, but the numeral-counter 三つ rendered as a plain noun is mildly misleading; flows from the missing NumeralPart type rather than authoring choice.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "三つ is a native-Japanese numeral/counter (three items) but is encoded as NounPart<\"三つ\">, hiding a numeral inside a noun wrapper. The library has no NumeralPart/CounterPart, so per the rubric NOTE this is a ts-def limitation.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "NounPart is POS-agnostic and loses the common-noun subclass for りんご (no CommonNoun distinction in the part type).",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Idiomatic analysis would treat 三つ as a numeral; forcing it into NounPart slightly misrepresents the segmentation, driven by the missing numeral part type.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "三つ is a numeral+counter (numeral, not a plain noun) but the library has no NumeralPart/CounterPart, so it is hidden inside a POS-agnostic NounPart, losing its numeral classification.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください is the imperative of the honorific verb くださる; the library has no くださる verb to conjugate, so it is frozen as a raw SuffixPart literal instead of an expressed conjugation.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください tagged as SuffixPart misrepresents its part of speech (request verb form), though no better constructor exists in the current types.",
+      "itemId": "r2-a1",
+      "jp": "りんごを三つください。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "二人 (ふたり) is a numeral+counter (二 + 人), not a plain noun. The library has no NumeralPart/CounterPart, and NounPart is POS-agnostic, so the count word is indistinguishable from an ordinary noun. The codebase itself uses CommonNoun<\"二人\"> for the same word, so this is the only expressible option, but it loses the numeral/counter analysis.",
+      "itemId": "r2-a2",
+      "jp": "二人で映画を見ました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "二人 is a numeral+counter (数詞: 二 + 人), not a 普通名詞. NounPart<\"二人\"> hides the counter structure and the non-noun POS. The library has no NumberPart/CounterPart/Numeral type to express this correctly.",
+      "itemId": "r2-a2",
+      "jp": "二人で映画を見ました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "NounPart is POS-agnostic and loses the common-noun subclass for 映画 (no CommonNoun label preserved in the Sentence path).",
+      "itemId": "r2-a2",
+      "jp": "二人で映画を見ました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "二人 is a numeral+counter expression (二 + 人) but is tagged as NounPart, which is POS-agnostic and hides the counter/numeral identity. The part union has no NumeralPart/CounterPart, so the library cannot express this distinction.",
+      "itemId": "r2-a2",
+      "jp": "二人で映画を見ました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "二人 collapses 二 (numeral) + 人 (counter) into a single leaf; no morpheme-level numeral/counter split is available.",
+      "itemId": "r2-a2",
+      "jp": "二人で映画を見ました。",
+      "source": "annotate"
+    }
+  ]
+}

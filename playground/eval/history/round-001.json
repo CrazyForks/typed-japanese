@@ -1,0 +1,602 @@
+{
+  "round": 1,
+  "sampled": 8,
+  "scored": 8,
+  "roundScore": 0.8472,
+  "byDimension": {
+    "D1": 0.833,
+    "D2": 0.875,
+    "D3": 0.958,
+    "D4": 0.771,
+    "D5": 1,
+    "D6": 0.646
+  },
+  "perItem": [
+    {
+      "id": "r1-c0",
+      "source": "chapter",
+      "chapter": "i08",
+      "jp": "早く寝るようにしてください",
+      "total": 9.33,
+      "verdict": "needs-work",
+      "issueCount": 8
+    },
+    {
+      "id": "r1-c1",
+      "source": "chapter",
+      "chapter": "e19",
+      "jp": "コーヒーを飲もう",
+      "total": 11,
+      "verdict": "conforms",
+      "issueCount": 5
+    },
+    {
+      "id": "r1-c2",
+      "source": "chapter",
+      "chapter": "i05",
+      "jp": "ここでお待ちします",
+      "total": 9,
+      "verdict": "needs-work",
+      "issueCount": 8
+    },
+    {
+      "id": "r1-c3",
+      "source": "chapter",
+      "chapter": "i01",
+      "jp": "雨に降られた",
+      "total": 9.67,
+      "verdict": "conforms",
+      "issueCount": 6
+    },
+    {
+      "id": "r1-c4",
+      "source": "chapter",
+      "chapter": "i05",
+      "jp": "営業中でございます",
+      "total": 10.33,
+      "verdict": "conforms",
+      "issueCount": 5
+    },
+    {
+      "id": "r1-a0",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "机の上に猫がいます。",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 1
+    },
+    {
+      "id": "r1-a1",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "毎日日本語を勉強します。",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 2
+    },
+    {
+      "id": "r1-a2",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "その店はとても便利だ。",
+      "total": 8,
+      "verdict": "needs-work",
+      "issueCount": 12
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Complete godan Volitional: append う so 飲む→飲もう (not 飲も)",
+      "rationale": "GodanConjugationMap maps Volitional to only the お-row mora (む→も, く→こ, …), so ConjugateVerb<飲む,'Volitional'> resolves to 飲も, not the full 飲もう. Ichidan/irregular by contrast yield the complete よう/しよう. This forces authors to append a raw literal う to finish the inflection, so conjugation correctness/idiomaticity depends on hand-spelling (r1-c1).",
+      "dimensions": [
+        "D4",
+        "D6"
+      ],
+      "change": "In src/verb-types.d.ts make godan Volitional emit the full ending. Either change each GodanConjugationMap entry Volitional value to the お-row mora + う (む→'もう', く→'こう', etc.), or special-case Volitional in ConjugateVerb's godan branch to append 'う' after GetGodanConjugation. Add type test ConjugateVerb<飲む,'Volitional'> === '飲もう'.",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Complete godan Passive/Causative auxiliary: 降る→降られ (not 降ら)",
+      "rationale": "GodanConjugationMap returns only the あ-row stem for Passive (る→'ら') and Causative, omitting the auxiliary れ/せ, while the ichidan branch returns the full ${stem}られ. So ConjugateVerb<降る,'Passive'> is 降ら, and authors append raw 'れた' to reach 降られた, hiding the passive auxiliary and past morphemes in a literal. Affects godan passive/causative items (r1-c3 plus sibling i03/i04 cited in issues).",
+      "dimensions": [
+        "D4",
+        "D6"
+      ],
+      "change": "In src/verb-types.d.ts complete the godan Passive/Causative surfaces to include the auxiliary: Passive → あ-row + 'れ' (る→'られ'), Causative → あ-row + 'せ'. Do this in the map values or by special-casing those forms in ConjugateVerb's godan branch (mirroring ichidan `${stem}られ`). Add test ConjugateVerb<降る,'Passive'> === '降られ'. WARNING: this changes the contract — audit chapters that currently append れ themselves (i03/i04/r1-c3) so it is not doubled.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add POS-preserving parts to the Sentence vocabulary (NaAdjective stem, Adnominal, noun subclass)",
+      "rationale": "In the Sentence<[...]> path NounPart is POS-agnostic (type:'noun', value:string), so authors must demote な-adjectives (便利), 連体詞 (その), and lose common/proper/pronoun subclass into a bare noun leaf. r1-a2 (便利だ, その店) is clearest: declared aliases Adnominal<その>/CommonNoun<店>/NaAdjective 便利 are discarded because the only landing slot is NounPart. Highest-frequency D1 cluster.",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "change": "In src/phrase-types.d.ts add: (1) AdnominalPart<A extends string> {type:'adnominal'; value:A}; (2) make NounPart carry its subclass (NounPart<N extends Noun> with value = N['word'], or add CommonNounPart/ProperNounPart/PronounPart); (3) route な-adjective predicates through AdjectivePart over a na-adjective stem + CopulaPart rather than NounPart. Add each to the PhrasePart union, then update the annotate prompt part list.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "prompt",
+      "title": "Forbid wrapping な-adjectives / 連体詞 in NounPart; route 便利だ through adjective+copula",
+      "rationale": "The prompt already says 'never wrap a non-noun in a noun type' yet r1-a2 wrapped 便利 (な-adjective) and その (連体詞) in NounPart with the correct aliases declared-but-unused. A sharper hard rule plus a worked example prevents this high-severity D1 misclassification systemically, independent of the ts-def part work.",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "change": "In playground/scripts/annotate.ts hard rules add: な-adjective predicates (便利だ, 静かだ) MUST be AdjectivePart over a NaAdjective stem + CopulaPart<'Plain'>, NEVER NounPart; 連体詞 (この/その/あの/どの) MUST use Adnominal/AdnominalPart, never NounPart. Add a one-line example (便利だ → AdjectivePart + CopulaPart<'Plain'>). Wire any new part names into the allowed-imports lists.",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add humble-polite copula form でございます to CopulaForm",
+      "rationale": "CopulaForm lacks a 丁重語 member, so 営業中でございます (r1-c4) can only be a raw literal suffix instead of ConjugateCopula<'営業中','...'>. Isolated, but a small additive change that makes a real inflection expressible.",
+      "dimensions": [
+        "D4",
+        "D2",
+        "D6"
+      ],
+      "change": "In src/copula-types.d.ts add a CopulaForm member (e.g. 'PoliteHumble') and matching Copula<F> branch → 'でございます'. Add test ConjugateCopula<'営業中','PoliteHumble'> === '営業中でございます'.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "content",
+      "title": "ここでお待ちします: conjugate する via ConjugateVerb<する,'Masu'> instead of literal します",
+      "rationale": "します is the Masu form of irregular する, fully supported by the library, but r1-c2 froze it as a raw literal, hiding a modellable conjugation (D4 high). Pure authoring slip — fix the one snippet.",
+      "dimensions": [
+        "D4",
+        "D2",
+        "D6"
+      ],
+      "change": "In the r1-c2 chapter snippet replace the trailing literal します with VerbPart<する,'Masu'> (or ${ConjugateVerb<する,'Masu'>}), keeping お as the honorific prefix literal and 待ち via the existing constructor. Resolution must stay ここでお待ちします.",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Optional: model よう formal-noun + に to expose the buried particle in ようにする",
+      "rationale": "In 早く寝るようにしてください (r1-c0) the particle に is buried inside the literal ように (D3, flagged high in one pass), and よう has no FormalNoun constructor so the formal-noun + particle decomposition is lost. Only one corpus item, but ようにする is a recurring fixed-expression class.",
+      "dimensions": [
+        "D3",
+        "D2",
+        "D6"
+      ],
+      "change": "Prefer a prompt rule first: in annotate.ts direct that the に in ように be surfaced as its own ParticlePart (よう + ParticlePart<'に'> + VerbPart<する,...>) while keeping ください whole as an auxiliary. Only add a FormalNoun/形式名詞 constructor for よう in src if frequency rises.",
+      "confidence": "low",
+      "frequency": 1
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "早く is the adverbial (連用形) form of the i-adjective 早い, but is tagged Adverb<\"早く\">, freezing an inflected adjective as a lexical adverb. If the library cannot derive adjective adverbial forms, this is a ts-def limitation rather than a true lexical adverb.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ください (imperative/honorific of くださる) and the ～ように pattern are kept as raw literals. Defensible as fixed expressions, but ください in particular is a modellable auxiliary that the library does not provide a constructor for.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The particle に in ように is hidden inside a raw string literal; the よう+に could in principle be a FormalNoun + Particle but the library likely lacks a clean よう formal-noun constructor, so に is not a visible unit.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ように collapses the formal noun よう and particle に into one leaf; no decomposition into morphemes.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "ようにする pattern: prompt could guide whether ように should be split (よう + に) or kept whole; current author kept it whole as a fixed expression which is defensible but borderline.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "Particle に in ように is hidden inside a raw string literal; library has Particle/Noun constructors so よう+に could be split, but the grammar pattern よう(様)+に+する is awkward to express through the typed library, leaving the particle invisible.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ように collapsed into one leaf; the nominal よう (様) + に decomposition is lost.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "prompt",
+      "note": "Annotate guidance could direct splitting the よう/に of the ようにする pattern rather than freezing it as a literal, while still keeping ください whole as an auxiliary.",
+      "itemId": "r1-c0",
+      "jp": "早く寝るようにしてください",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The godan Volitational table maps ending む to only the お-row mora も (GetGodanConjugation gives 飲も, confirmed by example-verb.ts comment // 買お). The library cannot produce the complete godan volitional 飲もう, so the author must append a literal う to ConjugateVerb<飲む,\"Volitional\">. The surface is correct Japanese but the conjugator is incomplete for godan volitional.",
+      "itemId": "r1-c1",
+      "jp": "コーヒーを飲もう",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Because of the same ts-def gap, the volitional ending う is a raw literal in the template instead of being modelled by the conjugator; defensible workaround but not a fully honest inflection encoding.",
+      "itemId": "r1-c1",
+      "jp": "コーヒーを飲もう",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "GetGodanConjugation maps Volitional to only the o-row mora (む→も, く→こ, etc.), unlike ichidan/irregular which return the full よう/しよう. This forces the author to append a raw う literal to complete 飲もう. The completion is correct Japanese, but the library's godan Volitional is incomplete; ideally ConjugateVerb<飲む,\"Volitional\"> would itself yield 飲もう.",
+      "itemId": "r1-c1",
+      "jp": "コーヒーを飲もう",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Godan Volitional in GodanConjugationMap (verb-types.d.ts) emits only the お-row mora (む→も), not the full ending よう/もう, so ConjugateVerb<飲む,'Volitional'> resolves to 飲も. The author must append a raw literal う in the template to reach 飲もう. A complete library would have the Volitional map produce もう and the conjugator alone would render the whole inflection; the externalized う is forced by this gap, not an authoring choice.",
+      "itemId": "r1-c1",
+      "jp": "コーヒーを飲もう",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Because the volitional ending is partly spelled as a raw literal, conjugation correctness depends on the author manually supplying う; the conjugator does not fully own the inflected surface for godan volitional.",
+      "itemId": "r1-c1",
+      "jp": "コーヒーを飲もう",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "します is the polite (Masu) form of irregular する, which the library CAN express as ConjugateVerb<する, \"Masu\"> (resolves to します). Leaving it as a raw literal hides a modellable inflection in this お…します humble construction.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "します as an opaque literal collapses a conjugated verb into a chunk; only で is honestly decomposed while the verbal ending hides structure.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "します is the Masu form of する but is written as a raw literal in the template instead of ConjugateVerb<する, 'Masu'>; the library supports irregular する conjugation, so this should go through the conjugator for fidelity.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The trailing します hides the する verb's structure as part of the literal template string rather than appearing as its own conjugated unit.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Honorific お prefix as a literal is defensible, but pairing it with a hand-spelled します undercuts the otherwise correct humble-frame analysis; ideally お${ConjugateVerb<待つ,'Masu'>}${ConjugateVerb<する,'Masu'>}.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "\"します\" is a raw literal; the する Masu stem し is expressible via ConjugateVerb<する,\"Masu\">, so the conjugatable verb is frozen into a string instead of being conjugated.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The humble complex お待ちします bundles honorific prefix お + 連用形 待ち + する; only 待ち is built via a constructor, leaving お and する hidden in literals.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The honorific prefix お and the ます polite auxiliary have no dedicated constructor in the library, so the お...します humble frame can only be partly expressed; spelling them as literals is somewhat forced.",
+      "itemId": "r1-c2",
+      "jp": "ここでお待ちします",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<降る, \"Passive\"> yields only the passive stem 降ら; the passive auxiliary れる cannot be further conjugated to its Ta form, forcing the れた tail to be hard-coded as a raw literal. The library has no way to chain Passive -> Ta, so the past-tense inflection is not expressed through the conjugator.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The れた suffix bundles the rest of the passive auxiliary (れ) plus the past marker (た) as a single opaque literal. Honest analysis would model 降る[Passive] then [Ta], but the library cannot, consistent with sibling chapters (i03/i04) that also append れた/れます/せられた as literals.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "GodanVerb Passive only yields the あ-row stem (降ら → 'ら'), not the full passive auxiliary れる. The author had to append 'れた' as a raw literal to reach 降られた; the conjugator cannot compose passive れる + past た, so the auxiliary inflection is not type-driven.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Because the library lacks a stacked-auxiliary/passive-past form, れた appears as a raw string literal. A Japanese teacher would analyze 降られた as 降ら+れ+た (passive auxiliary れる + past), which the library cannot express compositionally.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "ConjugateVerb<降る,'Passive'> for a godan verb returns only the a-stem 降ら (from GodanConjugationMap る.Passive='ら'), not the full passive 降られ. The auxiliary れる and the past た must be appended as the raw literal 'れた', so the passive+past inflection is not actually expressed by the conjugator. Library cannot chain the passive auxiliary れる into further conjugation.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Because of the above, the honest analysis 降る -> passive 降られる -> past 降られた is flattened: the れ (passive) and た (past) morphemes are hidden inside a string literal rather than each being a modeled conjugation step.",
+      "itemId": "r1-c3",
+      "jp": "雨に降られた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "でございます (very-polite/humble copula = ござる+ます) is not among CopulaForm's members (Plain/Polite/Past/Written/Te/etc.), so it cannot be produced by ConjugateCopula and must be a raw literal suffix on the noun.",
+      "itemId": "r1-c4",
+      "jp": "営業中でございます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Ideal analysis would be ConjugateCopula<\"営業中\", \"VeryPolite\"> rather than `${営業中}でございます`; the inflection is modellable in principle but the library exposes no such form, so the raw-literal copula is forced rather than an authoring choice.",
+      "itemId": "r1-c4",
+      "jp": "営業中でございます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "でございます is appended as an opaque literal. CopulaForm in src/copula-types.d.ts lacks a super-polite/courteous form (only Plain/Polite/...), and verb-types.d.ts has no ござる irregular (its 連用形 is ございnot ござり), so the copula+verb+ます span cannot be expressed via ConjugateCopula/ConjugateVerb. Decomposing it would require a new copula form or special verb; current frozen literal is the only honest option.",
+      "itemId": "r1-c4",
+      "jp": "営業中でございます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "でございます is the 丁重語 (humble-polite) copula but CopulaForm has no such member, so it is appended as a raw literal rather than via ConjugateCopula; an added form (e.g. 'PoliteHumble' -> でございます) would let it be expressed as a true copula inflection.",
+      "itemId": "r1-c4",
+      "jp": "営業中でございます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Because the copula table omits でございます (and ござる/ございます generally), the inflection is hard-coded; with library support the honest analysis would be 営業中 + ConjugateCopula(humble-polite).",
+      "itemId": "r1-c4",
+      "jp": "営業中でございます",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "In the Sentence<[...]> path, NounPart is POS-agnostic, so the common-noun subclass of 机/上/猫 is not encoded. Inherent library limitation, used appropriately here; no authoring error.",
+      "itemId": "r1-a0",
+      "jp": "机の上に猫がいます。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ます is emitted as a raw SuffixPart literal rather than modelled as the polite auxiliary, because the Masu conjugation returns only the renyokei stem (勉強し) and the library offers no auxiliary-verb constructor. Minor and unavoidable; stem+ます remains linguistically honest.",
+      "itemId": "r1-a1",
+      "jp": "毎日日本語を勉強します。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "NounPart is POS-agnostic so 日本語's common-noun subclass is not encoded, but no non-noun is hidden and the analysis is correct.",
+      "itemId": "r1-a1",
+      "jp": "毎日日本語を勉強します。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "便利 is a な-adjective (形容動詞) but is wrapped in NounPart<\"便利\">, tagging it as a noun. The library provides NaAdjective + AdjectivePart (e.g. AdjectivePart<{type:\"na-adjective\";stem:\"便利\"}, ...>), so this is an avoidable authoring slip, not a type-system gap. The honest analysis is na-adjective stem 便利 + plain copula だ.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "その is correctly given as Adnominal<\"その\"> but must be passed through NounPart, which is POS-agnostic and re-tags it as type:\"noun\", erasing the 連体詞 classification. No AdnominalPart exists in the phrase-part union.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Treating the predicate adjective 便利 as a plain noun gives a learner the wrong POS picture; a teacher would mark it 形容動詞. Segmentation is otherwise idiomatic and だ is correctly split out.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "便利 is a な-adjective but is stored as NounPart<\"便利\">. NounPart is POS-agnostic so it hides the NaAdjective; the library DOES model 便利 as NaAdjective (see a09/a10 chapters), so an adjective-aware part should carry it. NounPart silently demotes a 形容動詞 to a noun.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "その is an Adnominal (連体詞) and 店 a CommonNoun, but both are wrapped in POS-agnostic NounPart, losing the adnominal vs common-noun distinction even though the snippet bothers to declare type その = Adnominal and type 店 = CommonNoun (those aliases are then unused).",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "Honest analysis of 便利だ is na-adjective stem 便利 + copula だ (Plain). Treating 便利 as a noun leaf is misleading; the Sentence parts vocabulary has no NaAdjective-stem part, forcing the author into NounPart.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "だ is correctly CopulaPart<\"Plain\">, but because the stem is a NounPart literal rather than an adjective part, the 便利+だ predicate is not expressed through the adjective/copula conjugation machinery the library provides.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Declared aliases type その = Adnominal<\"その\"> and type 店 = CommonNoun<\"店\"> are passed into NounPart, which only accepts a string; this both discards the POS type and is a sloppy/likely-non-typechecking use of the declared aliases as type args to a string-parameter.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "便利 is a な-adjective (NaAdjective, べんり, na-adjective in vocab and used as NaAdjective in a09/i14) but is wrapped as NounPart<\"便利\"> tagged type:noun. The library exposes NaAdjective and AdjectivePart, so this is a wrong-POS authoring choice, not a missing type.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "その is correctly aliased Adnominal<\"その\"> but then placed in NounPart<その>, which is POS-agnostic (type:\"noun\") and erases the 連体詞 classification. NounPart hides a non-noun, exactly the ts-def case the rubric calls out; there is no AdnominalPart to carry it.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "店 is built as CommonNoun<\"店\"> but NounPart only stores a bare string, so the common/proper/pronoun subclass is lost in the Sentence path.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "便利だ is modeled as NounPart + CopulaPart instead of treating 便利 as a な-adjective stem; the copula surface is correct but the adjectival predicate analysis is not expressed.",
+      "itemId": "r1-a2",
+      "jp": "その店はとても便利だ。",
+      "source": "annotate"
+    }
+  ]
+}

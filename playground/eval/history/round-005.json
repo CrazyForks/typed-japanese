@@ -1,0 +1,514 @@
+{
+  "round": 5,
+  "sampled": 8,
+  "scored": 8,
+  "roundScore": 0.8299,
+  "byDimension": {
+    "D1": 0.708,
+    "D2": 0.75,
+    "D3": 0.854,
+    "D4": 0.875,
+    "D5": 1,
+    "D6": 0.771
+  },
+  "perItem": [
+    {
+      "id": "r5-c0",
+      "source": "chapter",
+      "chapter": "i06",
+      "jp": "読めば読むほど面白い",
+      "total": 11.33,
+      "verdict": "conforms",
+      "issueCount": 2
+    },
+    {
+      "id": "r5-c1",
+      "source": "chapter",
+      "chapter": "a12",
+      "jp": "言語は文化である",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r5-c2",
+      "source": "chapter",
+      "chapter": "i05",
+      "jp": "すぐ参ります",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r5-c3",
+      "source": "chapter",
+      "chapter": "a03",
+      "jp": "ここで諦めるわけにはいかない",
+      "total": 5,
+      "verdict": "needs-work",
+      "issueCount": 15
+    },
+    {
+      "id": "r5-c4",
+      "source": "chapter",
+      "chapter": "e01",
+      "jp": "私は学生です",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r5-a0",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "寿司を食べたことがあります。",
+      "total": 11.33,
+      "verdict": "conforms",
+      "issueCount": 3
+    },
+    {
+      "id": "r5-a1",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "子供の頃はよくここで遊んだ。",
+      "total": 10.67,
+      "verdict": "conforms",
+      "issueCount": 6
+    },
+    {
+      "id": "r5-a2",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "行かざるを得ない。",
+      "total": 5.33,
+      "verdict": "needs-work",
+      "issueCount": 14
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Make NounPart carry a noun subclass (common/proper/pronoun) instead of a bare string",
+      "rationale": "The single most frequent systemic issue: ~10 of 40 issues (r5-a0, r5-a1) are D1/D6 flags that NounPart<N extends string> erases the noun subclass. The library already defines value-identical CommonNoun/ProperNoun/Pronoun aliases, but NounPart only accepts a string, so a pronoun like ここ and formal noun こと are filed as generic nouns and the POS distinction is lost in the type. Fixing the constructor lifts every annotate item containing a pronoun or non-default noun at once.",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "change": "In /Users/evan/code/typed-japanese/src/phrase-types.d.ts, add a subclass tag to NounPart, e.g. NounPart<N extends string = string, Sub extends \"common\"|\"proper\"|\"pronoun\"|\"formal\" = \"common\"> with a nounClass: Sub field (value stays N). Optionally add a dedicated PronounPart alias for ここ/これ/私. Keep value identical so resolution (D5) is unaffected.",
+      "confidence": "high",
+      "frequency": 10
+    },
+    {
+      "target": "prompt",
+      "title": "Forbid burying demonstrative+particle and わけにはいかない grammar in raw literals",
+      "rationale": "r5-c3 (ここで諦めるわけにはいかない) generated ~13 high-severity D2/D3/D6 flags from ONE snippet: ここで collapses ここ+で, and わけにはいかない collapses わけ+に+は+いかない with three particles buried. The pattern (demonstrative + で, formal noun わけ + particles + 行く negative) recurs, so an explicit prompt rule prevents the model from emitting opaque leaves instead of fixing each chapter individually.",
+      "dimensions": [
+        "D2",
+        "D3",
+        "D6"
+      ],
+      "change": "In playground/scripts/annotate.ts hard rules, add: demonstrative pronouns (ここ/そこ/あそこ) followed by a particle MUST split into a Pronoun NounPart + ParticlePart (ここで → ここ + で). Formal-noun patterns like わけ/はず/つもり + に/は MUST expose the formal noun and each particle as separate parts; never freeze わけにはいかない as one literal. Extend the existing buried-particle validator to fire on で/に/は after a kana demonstrative.",
+      "confidence": "high",
+      "frequency": 13
+    },
+    {
+      "target": "prompt",
+      "title": "Never bury a modellable head verb inside a SuffixPart; route ない/ません through the conjugator",
+      "rationale": "r5-a2 (行かざるを得ない) produced ~12 high-severity D1/D2/D4/D6 flags because SuffixPart<\"行かざる\"> hides godan verb 行く (whose 未然形 行か the conjugator produces via Nai), and 得ない is split as VerbPart<得る,\"MasuStem\"> + SuffixPart<\"ない\"> instead of ConjugateVerb<得る,\"Nai\">. Same class as the retired trailing-ます error: a verb the library CAN conjugate must come from VerbPart, with only the genuinely unsupported classical ず/ざる as a residual suffix.",
+      "dimensions": [
+        "D1",
+        "D2",
+        "D4",
+        "D6"
+      ],
+      "change": "In annotate.ts hard rules, add: a SuffixPart string must NEVER contain kanji belonging to a conjugatable verb stem. Negation ない and polite negation come from ConjugateVerb<V,\"Nai\">/\"Masen\", not a trailing literal — use VerbPart<得る,\"Nai\"> for 得ない. Only the classical ず/ざる (and other unmodeled bound auxiliaries) may be a SuffixPart, attached AFTER a VerbPart<V,\"Nai\"> that exposes the lexical verb.",
+      "confidence": "high",
+      "frequency": 12
+    },
+    {
+      "target": "ts-def",
+      "title": "Add a classical negative auxiliary (ず / 連体形 ざる) conjugation form",
+      "rationale": "Minor: a few r5-a2 D4 notes correctly observe the classical negative ず (連体形 ざる) attaching to 未然形 has no constructor, so ざる legitimately falls back to a SuffixPart. A genuine but narrow gap (古文 negatives); the bigger win is not burying 行く with it (covered above). Worth a small ts-def addition only if classical forms recur.",
+      "dimensions": [
+        "D4"
+      ],
+      "change": "In /Users/evan/code/typed-japanese/src/verb-types.d.ts, add a classical-negative form (e.g. \"ZaruAttributive\") mapping the Nai stem + ざる (行か→行かざる), so ざるを得ない can use VerbPart<行く,\"ZaruAttributive\"> instead of a literal. Lower priority than the constructor and prompt fixes.",
+      "confidence": "low",
+      "frequency": 2
+    },
+    {
+      "target": "content",
+      "title": "Use ParticlePart<\"ほど\"> for the 〜ば〜ほど construction in r5-c0",
+      "rationale": "r5-c0 (読めば読むほど面白い): low-severity D3/D6 — ほど is a 副助詞 already in the Particle union and ParticlePart but is left as a raw literal. One-off authoring fix; low impact but trivial and honest.",
+      "dimensions": [
+        "D3",
+        "D6"
+      ],
+      "change": "In the chapter snippet for 読めば読むほど面白い, replace the raw ほど literal with ParticlePart<\"ほど\">. The bare ば after the Hypothetical stem may stay.",
+      "confidence": "medium",
+      "frequency": 1
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D3",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ほど is a 副助詞 and the library defines Particle 'ほど' / ParticlePart; it is left as a raw literal in the template instead of a typed particle leaf.",
+      "itemId": "r5-c0",
+      "jp": "読めば読むほど面白い",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The 〜ば〜ほど construction's particles (ば/れば and ほど) are modellable via Particle/ConditionalParticle but expressed as raw string literals, slightly less idiomatic than a teacher's segmentation. The bare ば appended after the Hypothetical stem is defensible, but ほど has a dedicated type.",
+      "itemId": "r5-c0",
+      "jp": "読めば読むほど面白い",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particle で in ここで is buried in a literal; should be ここ (Pronoun/demonstrative) + で particle as separate units.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles に and は inside わけにはいかない are buried; library has particle constructors to expose them.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "ここで and わけにはいかない collapse multiple morphemes into single opaque literals, hiding internal structure.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "いかない is the negative form of 行く and could be expressed via the conjugator rather than a raw literal.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ここ (demonstrative pronoun) and いかない (verb) receive no constructor/POS; only 諦める is modeled.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles で, に, は are buried in the literals ここで and わけにはいかない instead of being visible particle units.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "わけにはいかない collapses わけ(noun)+に+は+いかない(verb) into one opaque leaf; ここで collapses ここ+で.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "いかない is the negative (未然形+ない) of Godan verb 行く and could be expressed via the conjugator (ConjugateVerb<行く,\"Nai\">) rather than frozen in a literal.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Only the single verb 諦める is modeled; the rest of the sentence including a conjugated verb and three particles is left as raw text, not matching idiomatic analysis.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ここ (demonstrative pronoun) gets no Pronoun constructor; left inside a literal.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles で (in ここで) and に/は (in わけにはいかない) are buried in raw literals; particle integrity broken. ここで at minimum should expose で.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "'ここで' collapses ここ + で and 'わけにはいかない' collapses わけ + に + は + いかない into single leaves; only 諦める is decomposed.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "ここ (pronoun/demonstrative) and the formal noun わけ are not placed in any noun constructor; they are hidden in literals.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "いかない is the Negative (ナイ) form of 行く and is modellable via ConjugateVerb, but it is frozen as a literal; defensible only if treating わけにはいかない as a fixed idiom.",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "わけにはいかない is reasonably kept whole as a fixed pattern, but ここで is plain grammar and should be decomposed (ここ + で).",
+      "itemId": "r5-c3",
+      "jp": "ここで諦めるわけにはいかない",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "寿司 and こと are 普通名詞 but use bare NounPart<\"...\">, hiding the noun subclass. Library has CommonNoun, but NounPart only accepts a string, so the common-noun label is lost. こと here is also a 形式名詞 (formal noun); CommonNoun is the closest available wrapper.",
+      "itemId": "r5-a0",
+      "jp": "寿司を食べたことがあります。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "こと is a 形式名詞 (formal/dependent noun) and 寿司 a 普通名詞; NounPart cannot distinguish common vs formal-noun subclass, so the analysis is correct but the distinction is not surfaced in the type.",
+      "itemId": "r5-a0",
+      "jp": "寿司を食べたことがあります。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "寿司 and こと go through POS-agnostic NounPart, which cannot record the common-noun (普通名詞) / 形式名詞 subclass; a subclass-tagged noun constructor would preserve information NounPart erases.",
+      "itemId": "r5-a0",
+      "jp": "寿司を食べたことがあります。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ここ is a 指示代名詞 (demonstrative pronoun) but is wrapped in NounPart, which is POS-agnostic and exposes no Pronoun subclass; the library lacks a PronounPart, so the pronoun POS is lost.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "子供 and 頃 are 普通名詞 but NounPart cannot record the common-noun subclass (no CommonNoun distinction), so the noun subclass is not preserved even though the choice is defensible.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Treating ここ as a generic noun rather than a demonstrative pronoun is mildly non-idiomatic; a teacher would label it 代名詞.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ここ is a 代名詞 (demonstrative pronoun) but is filed under NounPart, which is POS-agnostic and exposes no pronoun subclass; the library has a Pronoun<> alias but no dedicated PronounPart phrase constructor, so the pronoun distinction is lost.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "子供 and 頃 are 普通名詞 but NounPart does not record the common-noun subclass; no CommonNounPart exists to preserve it.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ここ is a demonstrative pronoun (代名詞) but is wrapped in NounPart, which is POS-agnostic and offers no PronounPart constructor, so the pronoun subclass is silently lost. 子供/頃 as common nouns suffer the same agnostic-noun limitation but are at least the right broad category.",
+      "itemId": "r5-a1",
+      "jp": "子供の頃はよくここで遊んだ。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "SuffixPart<\"行かざる\"> buries the content verb 行く (godan, 未然形 行か) plus the classical negative auxiliary ず in 連体形 ざる. 行く is fully modellable as a GodanVerb (its Nai/未然形 stem is か), so the verb should not be hidden in a suffix string. Only the classical ず→ざる auxiliary is genuinely unsupported.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "行かざる is a single leaf collapsing a verb stem and an auxiliary; no internal decomposition into 行か + ざる.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The classical negative ず (連体形 ざる) attaching to a 未然形 has no constructor in the library, forcing the literal. The polite/Nai paradigm does not cover 古文 negatives.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "得 is produced via VerbPart<得る,\"MasuStem\"> but the negative ない attaches to the 未然形. For ichidan both MasuStem and Nai resolve to bare 得, so surface is fine, but the form label misrepresents the morphology; ConjugateVerb<得る,\"Nai\"> would be the honest choice (also yields 得).",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "得ない is split as VerbPart(MasuStem) + SuffixPart<\"ない\">; since the library's ichidan Nai form only yields the bare stem 得 (not 得ない), the trailing ない literal is unavoidable, but the analysis would read more idiomatically with the Nai form labeled rather than MasuStem.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "行く is a standard godan verb the library models; freezing 行か into SuffixPart<\"行かざる\"> hides the verb POS. The verb should be a VerbPart (行く mizenkei) with only the classical ざる auxiliary as a suffix.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "行か(未然形)+ざる are merged into one leaf. The modern paradigm lacks a 未然形/ざる auxiliary form, so the morpheme split cannot be fully expressed — but 行く itself should still surface as a verb rather than the whole span being one suffix.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "得ない = ConjugateVerb<得る,\"Nai\">, directly supported. It is instead MasuStem 得 + raw SuffixPart<\"ない\">; should be VerbPart<得る,\"Nai\"> so the negative inflection comes from the conjugator.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Segmentation misrepresents the ざるを得ない idiom: head verb hidden in a suffix and negation as a detached literal. Even keeping the fixed expression whole would be more honest than this split.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "行く is buried inside SuffixPart<\"行かざる\">. It should be VerbPart<行く,\"Nai\"> (resolves to 行か) plus a separate SuffixPart<\"ざる\"> for the classical negative auxiliary ず, which the verb conjugator does support for the 行か part.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "行かざる must decompose into 行か (verb) + ざる (auxiliary). Collapsing them hides the verb and the auxiliary morpheme.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The 〜ざるを得ない pattern's first verb should be exposed as the actual lexical verb (行く); freezing it as a suffix string is actively misleading analysis.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "得 before ない is the negative base (未然形); the snippet labels it \"MasuStem\" (連用形). For ichidan both surfaces are 得, so it type-checks, but \"Nai\" is the correct form name.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The library has no dedicated classical-negative (ず/ざる) auxiliary form, so ざる legitimately needs a SuffixPart; that part of the analysis is honest. The error is burying 行く along with it.",
+      "itemId": "r5-a2",
+      "jp": "行かざるを得ない。",
+      "source": "annotate"
+    }
+  ]
+}

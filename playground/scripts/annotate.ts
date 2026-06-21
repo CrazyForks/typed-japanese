@@ -110,14 +110,15 @@ IchidanVerb  = { type:"ichidan";  stem:string; ending:"る" }
 IrregularVerb= { type:"irregular"; dictionary:"する"|"来る"|"くる" }
 SuruVerb<Noun extends string> = a noun + する compound verb, e.g. SuruVerb<"勉強"> resolves as 勉強する
 ConjugateVerb<V extends Verb, F extends ConjugationForm>
-ConjugationForm = "Dictionary"|"Masu"|"Te"|"Ta"|"Nai"|"Potential"|"Passive"|"Causative"|"Volitional"|"Imperative"|"Conditional"|"Hypothetical"
+ConjugationForm = "Dictionary"|"MasuStem"|"Masu"|"MasuPast"|"Masen"|"MasenDeshita"|"Te"|"Ta"|"Nai"|"Potential"|"Passive"|"Causative"|"Volitional"|"Imperative"|"Conditional"|"Hypothetical"
+  // Polite paradigm is FULLY realized: Masu→話します, MasuPast→話しました, Masen→話しません, MasenDeshita→話しませんでした. MasuStem→話し is the bare 連用形 (use it only to mount たい/ましょう/お〜する/お〜になる/つつ, e.g. お待ちする = お + ConjugateVerb<待つ,"MasuStem"> + する).
   // declare a verb as an intersection: type 話す = GodanVerb & { stem:"話"; ending:"す" };
 
 # Adjectives — adjective-types
 IAdjective  = { type:"i-adjective";  stem:string; ending:"い"; irregular?:boolean }
 NaAdjective = { type:"na-adjective"; stem:string }
 ConjugateAdjective<A extends Adjective, F extends AdjectiveConjugationForm>
-AdjectiveConjugationForm = "Basic"|"Polite"|"Past"|"Negative"|"Te"
+AdjectiveConjugationForm = "Basic"|"Polite"|"Past"|"Negative"|"Te"|"Adverbial"  // Adverbial 連用形: i-adj く (早く), na-adj に (上手に). 上手になる → AdjectivePart<上手,"Adverbial"> + VerbPart<なる,...>
   // いい is irregular: type いい = IAdjective & { stem:"い"; ending:"い"; irregular:true };
 
 # Copula だ/です — copula-types (NOT a particle: it inflects)
@@ -126,7 +127,11 @@ Copula<F extends CopulaForm = "Plain">
 CopulaForm = "Plain"(だ)|"Polite"(です)|"Past"(だった)|"PolitePast"(でした)|"Negative"(ではない)|"PoliteNegative"(ではありません)|"NegativePast"(ではなかった)|"PoliteNegativePast"(ではありませんでした)|"CasualNegative"(じゃない)|"CasualPoliteNegative"(じゃありません)|"Written"(である)|"Te"(で)
 
 # Nouns / adverbs — noun-types, adverb-types
-ProperNoun<Name extends string>            // = Name
+CommonNoun<Name extends string>   // = Name — 普通名詞: 猫, 机, 言い訳, 仕事 (the DEFAULT for ordinary nouns)
+ProperNoun<Name extends string>   // = Name — 固有名詞: ONLY names of people/places/works/products (東京, ヒンメル, TypeScript)
+Pronoun<Name extends string>      // = Name — 代名詞: これ, それ, あれ, ここ, 私, 彼, 誰
+Adverb<Word extends string>       // = Word — 副詞 with NO adjective base only: 毎日, すぐ, また, とても, ずっと (NOT 早く/本当に — those are adjective 連用形, see rule below)
+Adnominal<Word extends string>    // = Word — 連体詞: この, その, あの, どの (modifies a following noun)
 InterrogativeAdverb = "なぜ"|"なんで"|"どうして"|"いつ"|"どこ"|"だれ"|"誰"|"何"|"なに"|"どんな"|"どれ"
 Demonstrative = "こう"|"そう"|"ああ"|"どう"
 
@@ -139,15 +144,20 @@ PunctuationMark = "、"|"。"|"！"|"？"|"（"|"）"|"("|")"|"「"|"」"|"『"|
 Sentence<[
   ...PhrasePart[]
 ]> // joins each part's value with no separator and resolves to the final sentence
-VerbPart<V, F>                 // value = ConjugateVerb<V,F>
+VerbPart<V, F>                 // value = ConjugateVerb<V,F>. For polite endings use the form directly (VerbPart<行く,"Masu"> = 行きます) — do NOT add a SuffixPart<"ます">. Past/neg: "MasuPast"/"Masen"/"MasenDeshita".
 AdjectivePart<A, F>            // value = ConjugateAdjective<A,F>
-NounPart<N extends string>     // one lexical Japanese noun/content unit
+NounPart<N extends string>     // one 普通名詞 (common noun) — the default
+PronounPart<N extends string>  // a 代名詞: これ / それ / ここ / 私 / 誰
+ProperNounPart<N extends string> // a 固有名詞 (name): 東京 / ヒンメル / TypeScript
 TechnicalTermPart<T extends string> // filenames, code identifiers, ASCII product names, TODO, degraded, etc.
 WhitespacePart<W extends string> // visible spacing between technical terms and Japanese grammar, normally WhitespacePart<" ">
 AdverbPart<A extends string>   // one adverb such as まだ / もう / そう
+AdnominalPart<A extends string> // one 連体詞 such as この / その / あの / どの
+NumeralPart<N extends string>   // a bare numeral such as 三 / 百
+CounterPart<Num extends string, Counter extends string> // a counter expression; value joins Num+Counter — 三つ = CounterPart<"三","つ">, 二人 = CounterPart<"二","人">, 一冊 = CounterPart<"一","冊">
 ParticlePart<P extends Particle>
 CopulaPart<F extends CopulaForm>
-SuffixPart<S extends string>   // auxiliaries/endings/formal nouns not otherwise modeled, e.g. た, まま, どおり
+SuffixPart<S extends string>   // ONLY bound/grammatical morphemes with no other constructor: た, まま, どおり, ～的, ～化. NEVER a free content word (a な-adjective or noun is NOT a SuffixPart).
 PunctuationPart<P extends PunctuationMark>
 
 // Older combinators still exist, but do NOT use NounPhrase for generated long sentences.
@@ -180,7 +190,19 @@ ${API_REFERENCE}
 - The final alias MUST use Sentence<[...parts]> or an alias that expands directly to Sentence<[...parts]>.
 - Build the sentence as a flat, auditable part sequence. Every Japanese particle/助詞 in the input must be its own ParticlePart. Split particle-like compounds when useful: でも can be AdjectivePart<..., "Te"> + ParticlePart<"も">, and という can be ParticlePart<"と"> + VerbPart<いう, "Dictionary">.
 - Every punctuation mark must be a PunctuationPart. Do not hide 、 。 「 」 （ ） inside noun strings.
-- Inflectable Japanese words should use VerbPart, AdjectivePart, or CopulaPart whenever the type system can express them. Use SuruVerb<"起動"> for 起動する / 起動した / 起動され...
+- Inflectable Japanese words should use VerbPart, AdjectivePart, or CopulaPart whenever the type system can express them.
+- Any noun+する compound (勉強する, 起動する, 確認する, 説明する) MUST be a single SuruVerb<"勉強"> inside one VerbPart — NEVER split into CommonNoun<"勉強"> + a separate IrregularVerb する.
+- SuffixPart is ONLY for bound grammatical morphemes. A な-adjective (上手, 便利, 静か, 元気, 有名) is NEVER a SuffixPart and NEVER a NounPart — use AdjectivePart over a NaAdjective stem (上手になる → AdjectivePart<{type:"na-adjective";stem:"上手"},"Adverbial"> giving 上手に, then VerbPart<なる,...>). A common noun is never a SuffixPart either.
+- A clause-connecting 接続助詞 after a Te-form (から in 洗ってから, けど, ので) MUST be its own ParticlePart — never glued into a literal after ConjugateVerb<V,"Te">.
+- Negative te-forms come from the conjugator: 〜なくて(も) is ConjugateVerb<V,"Nakute"> (来なくて), then も as its own particle — never a frozen なくても literal.
+- Stack particles individually: には/では/ても = nested PhraseWithParticle (e.g. PhraseWithParticle<PhraseWithParticle<X,"に">,"は">) or sequential ParticlePart; never write a bare particle literal between typed units.
+- Classical auxiliaries (べき, ぬ, ざる) may stay as literals, but a FOLLOWING modern copula だ/です MUST be Copula<"Plain">/ConjugateCopula — write べき${Copula<"Plain">}, never the literal べきだ.
+- An adjective in its 連用形 (i-adjective く: 早く, 高く, よく; na-adjective に: 本当に, 上手に, 静かに) is NOT a lexical 副詞 — model it as AdjectivePart<A, "Adverbial"> (or ConjugateAdjective<A, "Adverbial">), NEVER Adverb/AdverbPart. Reserve Adverb for words with no adjective base (毎日, すぐ, また, とても).
+- Choose a verb's class by its REAL conjugation type (godan/ichidan/irregular), NEVER by which class happens to make the target surface resolve. Reclassifying a godan verb as IchidanVerb (or vice versa) to force a form is a hard error even if it type-checks — sanity-check that the implied Dictionary form is a real word. If the library cannot produce a verb's correct surface (e.g. honorific -aru verbs おっしゃる/いらっしゃる/なさる, whose 連用形 is the irregular おっしゃい/いらっしゃい/なさい), declare the verb in its TRUE class and write the unmodelable inflected surface as a documented raw literal — do not fake the class.
+- A SuffixPart string must NEVER contain a conjugatable verb stem. Negation ない / polite negative come from the conjugator: 得ない = VerbPart<得る,"Nai">, 行かない = VerbPart<行く,"Nai">, NOT VerbPart<…,"MasuStem"> + SuffixPart<"ない"> and NOT SuffixPart<"行かざる">. Expose the lexical verb as a VerbPart; only a genuinely unmodeled bound auxiliary (e.g. classical ざる) may be a trailing SuffixPart after that VerbPart.
+- Pick the noun part by subclass: PronounPart for 代名詞 (これ/それ/ここ/私/誰), ProperNounPart for 固有名詞 (names), NounPart for ordinary 普通名詞. A demonstrative pronoun followed by a particle MUST split: ここで → PronounPart<"ここ"> + ParticlePart<"で">, never a literal ここで. Formal-noun grammar (わけ/はず/つもり/こと + に/は/が) MUST expose the formal noun (NounPart) and each particle as separate parts — never freeze わけにはいかない as one literal.
+- When you declare a standalone noun alias, pick the right subclass: CommonNoun for ordinary nouns (the default), ProperNoun ONLY for actual names (people/places/works/products), Pronoun for これ/それ/彼/誰. Never wrap a whole phrase (e.g. 机の上, この本) or a non-noun (adverb, na-adjective) in a noun type — 机の上 is 机 + の + 上, この本 is Adnominal<"この"> + CommonNoun<"本">.
+- NounPart is for NOUNS ONLY; never put a non-noun in it. A 連体詞 (この/その/あの/どの) MUST be an AdnominalPart<"その">, never a NounPart. A な-adjective (便利, 静か, 有名) is NOT a noun: attributively use AdjectivePart<NaAdjective, "Basic"> (→ 便利な); as a plain predicate (便利だ) use AdjectivePart<NaAdjective, "Basic"> only when な is wanted — for the bare-stem + copula predicate, model 便利 as the NaAdjective and だ as CopulaPart<"Plain">. Wrapping 便利 or その in NounPart is a hard error. Likewise a counter expression (三つ, 二人, 一冊, 五枚) is a 数詞, NOT a noun: use CounterPart<Num, Counter> (三つ → CounterPart<"三","つ">), and a bare numeral uses NumeralPart — never NounPart.
 - Technical identifiers and English/code terms (filenames, env, TODO, degraded, pb_test_<slug>) should use TechnicalTermPart. Japanese lexical content words may use NounPart or AdverbPart, but a NounPart/AdverbPart must be ONE lexical unit, not a clause with particles inside it.
 - Do not put leading/trailing spaces inside TechnicalTermPart. Use WhitespacePart<" "> for spaces around English/code terms, while spaces inside one technical expression such as "hello world" or "pb_test_<slug> + sim-users seed" must stay inside that one TechnicalTermPart.
 - Do not use NounPhrase<"...">, template literal glue, or long raw string literals as a shortcut. Literal-looking content is allowed only for technical terms or one lexical content word wrapped in a typed part.

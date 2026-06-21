@@ -1,0 +1,17 @@
+{
+  "_comment": "Fixed parsing benchmark — the SAME items every round, so the conformance trend is comparable (unlike the old random per-round sampling). Spans clean / medium / hard-idiom chapters. Each round re-extracts the CURRENT chapter code for these jp, so improving a chapter shows up as a benchmark gain. Grow this set deliberately; don't randomize it.",
+  "items": [
+    { "id": "e01", "jp": "私は学生です" },
+    { "id": "i05", "jp": "すぐ参ります" },
+    { "id": "i14", "jp": "行きますが遅れます" },
+    { "id": "e08", "jp": "昨日は寒かった" },
+    { "id": "a12", "jp": "言語は文化である" },
+    { "id": "e19", "jp": "コーヒーを飲もう" },
+    { "id": "i08", "jp": "早く寝るようにしてください" },
+    { "id": "i06", "jp": "読めば読むほど面白い" },
+    { "id": "a03", "jp": "今日は休むわけにはいきません" },
+    { "id": "e17", "jp": "今日は来なくてもいいです" },
+    { "id": "a12", "jp": "知らぬ人に声をかけられた" },
+    { "id": "i10", "jp": "本当のことを言うべきだ" }
+  ]
+}

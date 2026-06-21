@@ -1,0 +1,119 @@
+{
+  "round": 1,
+  "sampled": 12,
+  "scored": 12,
+  "roundScore": 0.7639,
+  "byDimension": {},
+  "perItem": [
+    {
+      "id": "e01",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "私は学生です",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "i05",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "すぐ参ります",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "i14",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "行きますが遅れます",
+      "total": 11,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "e08",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "昨日は寒かった",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "a12",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "言語は文化である",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "e19",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "コーヒーを飲もう",
+      "total": 10,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "i08",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "早く寝るようにしてください",
+      "total": 7,
+      "verdict": "needs-work",
+      "issueCount": 0
+    },
+    {
+      "id": "i06",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "読めば読むほど面白い",
+      "total": 11,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "a03",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "今日は休むわけにはいきません",
+      "total": 3,
+      "verdict": "needs-work",
+      "issueCount": 0
+    },
+    {
+      "id": "e17",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "今日は来なくてもいいです",
+      "total": 5,
+      "verdict": "needs-work",
+      "issueCount": 0
+    },
+    {
+      "id": "a12b",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "知らぬ人に声をかけられた",
+      "total": 6,
+      "verdict": "needs-work",
+      "issueCount": 0
+    },
+    {
+      "id": "i10",
+      "source": "benchmark",
+      "chapter": null,
+      "jp": "本当のことを言うべきだ",
+      "total": 9,
+      "verdict": "needs-work",
+      "issueCount": 0
+    }
+  ],
+  "proposals": [],
+  "issues": []
+}

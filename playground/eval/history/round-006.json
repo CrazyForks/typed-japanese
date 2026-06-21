@@ -1,0 +1,697 @@
+{
+  "round": 6,
+  "sampled": 8,
+  "scored": 8,
+  "roundScore": 0.6944,
+  "byDimension": {
+    "D1": 0.667,
+    "D2": 0.583,
+    "D3": 0.688,
+    "D4": 0.688,
+    "D5": 1,
+    "D6": 0.521
+  },
+  "perItem": [
+    {
+      "id": "r6-c0",
+      "source": "chapter",
+      "chapter": "i10",
+      "jp": "本当のことを言うべきだ",
+      "total": 8,
+      "verdict": "needs-work",
+      "issueCount": 10
+    },
+    {
+      "id": "r6-c1",
+      "source": "chapter",
+      "chapter": "e08",
+      "jp": "昨日は寒かった",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 1
+    },
+    {
+      "id": "r6-c2",
+      "source": "chapter",
+      "chapter": "a12",
+      "jp": "知らぬ人に声をかけられた",
+      "total": 7.33,
+      "verdict": "needs-work",
+      "issueCount": 12
+    },
+    {
+      "id": "r6-c3",
+      "source": "chapter",
+      "chapter": "e17",
+      "jp": "今日は来なくてもいいです",
+      "total": 4.67,
+      "verdict": "needs-work",
+      "issueCount": 14
+    },
+    {
+      "id": "r6-c4",
+      "source": "chapter",
+      "chapter": "a03",
+      "jp": "今日は休むわけにはいきません",
+      "total": 3.33,
+      "verdict": "needs-work",
+      "issueCount": 13
+    },
+    {
+      "id": "r6-a0",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "水を飲みすぎた。",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r6-a1",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "窓を開けてもいいですか。",
+      "total": 12,
+      "verdict": "conforms",
+      "issueCount": 0
+    },
+    {
+      "id": "r6-a2",
+      "source": "annotate",
+      "chapter": null,
+      "jp": "先生がおっしゃいました。",
+      "total": 7.33,
+      "verdict": "needs-work",
+      "issueCount": 10
+    }
+  ],
+  "proposals": [
+    {
+      "target": "ts-def",
+      "title": "Add honorific irregular-aru verbs (おっしゃる/なさる/いらっしゃる/くださる/ござる) to the conjugation maps",
+      "rationale": "The rubric's named D1 failure: おっしゃる is a godan honorific verb whose 連用形 softens irregularly to おっしゃい (not おっしゃり), so its ます形 is おっしゃいます. The library's IrregularConjugationMap is a closed set covering only する/来る/くる, and GodanVerb mechanically yields おっしゃります. With no honest way to model the verb, the annotate output (r6-a2) faked it as IchidanVerb{stem:'おっしゃい';ending:'る'} purely to force MasuPast=おっしゃいました — which simultaneously implies a bogus Dictionary form おっしゃいる. This same gap drives 6 of the 7 r6-a2 issues (D1/D4/D6) and recurs for the whole -aru honorific family taught in i04.ts/a01.ts.",
+      "dimensions": [
+        "D1",
+        "D4",
+        "D6"
+      ],
+      "change": "In <repo>/src/verb-types.d.ts add a HonorificAruVerb class (e.g. { type: 'honorific-aru'; dictionary: 'おっしゃる'|'なさる'|'いらっしゃる'|'くださる'|'ござる' }) plus a map giving each its irregular 連用形 (おっしゃい, なさい, いらっしゃい, ください, ござい) and dictionary/Te/Ta/Imperative forms, so GetMasuStem yields the い-stem and Masu/MasuPast resolve to おっしゃいます/おっしゃいました. Wire it into Verb and ConjugateVerb. Then update annotate's API_REFERENCE to list these dictionary keys.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "prompt",
+      "title": "Forbid faking verb class to force a surface; never reclassify a godan verb as ichidan",
+      "rationale": "Independent of whether the -aru class is added, the annotate output committed a wrong-class error (modeling honorific godan おっしゃる as IchidanVerb so the surface coincidentally resolved). The rubric explicitly names this as a 0 on D1 even when the surface type-checks. The prompt has no rule against picking a verb class for its conjugation side-effect, and no documented honest fallback (a01.ts uses a raw literal おっしゃいました with an explanatory comment). A single hard rule prevents this whole category for any verb the conjugator cannot model.",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "change": "In annotate.ts Hard rules add: 'Choose a verb's class by its real conjugation type (godan/ichidan/irregular), NEVER by which class happens to make the target surface resolve. Reclassifying a godan verb as IchidanVerb (or vice versa) to force a form is a hard error even if it type-checks — verify the implied Dictionary form is a real word. If the library cannot produce a verb's correct surface (e.g. honorific -aru verbs whose 連用形 is irregular), declare the verb in its true class and write the unmodelable surface as a documented raw literal rather than faking the class.'",
+      "confidence": "high",
+      "frequency": 1
+    },
+    {
+      "target": "content",
+      "title": "Decompose frozen predicate tails in chapter snippets (かけられた / なくてもいいです / わけにはいきません)",
+      "rationale": "Three chapter snippets (r6-c2 a03, r6-c3 e08, r6-c4 i10) each dump a multi-morpheme predicate as one raw literal, hiding modellable verbs, particles, and conjugations — the single largest cluster of high-severity D2/D3/D4 issues (≈30 of 60). Each is fully expressible today: かけられた = VerbPart<かける(ichidan),'Passive'> + た literal; わけにはいきません = CommonNoun<'わけ'> + に + は + VerbPart<行く,'Masen'>; いいです = AdjectivePart<いい,'Polite'> with the も/て particles exposed. The conjugator already supports Masen, Passive, and polite adjective forms, so these are authoring slips, not library gaps.",
+      "dimensions": [
+        "D2",
+        "D3",
+        "D4",
+        "D1"
+      ],
+      "change": "Edit a03.ts (知らぬ人に声をかけられた), e08.ts (今日は来なくてもいいです), and i10.ts (今日は休むわけにはいきません): rebuild each frozen tail as a Sentence/typed-part composition — declare かける as IchidanVerb and use ConjugateVerb Passive; declare 行く as GodanVerb and use Masen; expose わけ as CommonNoun and に/は/も/て as their own ParticlePart units; render いい via the irregular IAdjective Polite form. Keep only genuinely unmodelable bits (e.g. classical ぬ) as documented literals.",
+      "confidence": "high",
+      "frequency": 3
+    },
+    {
+      "target": "content",
+      "title": "Split べきだ in 本当のことを言うべきだ into べき (literal) + Copula<\"Plain\">, and expose の",
+      "rationale": "r6-c0 (a12) accounts for ~12 issues: the genitive の is buried in a template literal `${本当}の${こと}` (D3 high), and べきだ collapses the modellable copula だ with the unmodelable formal-noun べき (D2/D4/D6). The copula is expressible via Copula<'Plain'>=だ and の must be its own ParticlePart; only べき need remain a literal. This is a one-off authoring fix, not a library gap.",
+      "dimensions": [
+        "D2",
+        "D3",
+        "D4"
+      ],
+      "change": "Edit a12.ts: replace the `${本当}の${こと}` glue with CommonNoun<'本当'> + ParticlePart<'の'> + CommonNoun<'こと'>, keep を as a ParticlePart, model 言う as VerbPart, and split the tail into SuffixPart<'べき'> + CopulaPart<'Plain'> instead of the raw literal べきだ.",
+      "confidence": "medium",
+      "frequency": 1
+    },
+    {
+      "target": "ts-def",
+      "title": "Add a negative-auxiliary (ない) adjectival conjugation so なくて / なく is modellable",
+      "rationale": "Multiple r6-c3 issues (D6 high, D4/D6 ts-def) note that verb 'Nai' returns only the 未然形 stem (来/こ), forcing authors to bolt なくて on as a literal that splits one negative morpheme across a tag and a string. ない inflects like an i-adjective (なく/なくて/なかった), so a NegativeAuxiliary form would let なくてもいい and similar permission/obligation constructions be built honestly across many future sentences rather than frozen.",
+      "dimensions": [
+        "D4",
+        "D6",
+        "D2"
+      ],
+      "change": "In <repo>/src extend the conjugator so a verb's negative can yield i-adjective-like forms of ない: e.g. a 'NaiAdverbial' (来なく) and 'NaiTe' (来なくて), or expose ない as a conjugatable auxiliary i-adjective that mounts on the Nai-stem. Then document it in annotate's API_REFERENCE and reference it in the なくて hard rule.",
+      "confidence": "low",
+      "frequency": 1
+    }
+  ],
+  "issues": [
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The genitive/linking particle の is embedded inside the literal `${本当}の${こと}` instead of being expressed as its own visible particle unit; only を is properly extracted via PhraseWithParticle.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "本当のこと is partially fused: の is hidden in a template literal rather than decomposed into noun + particle + noun.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "べきだ is a raw literal because the library has no Beki/auxiliary construct for べき + copula; honest but not modellable.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "べき is a 形式名詞 (formal/auxiliary noun) the library has no constructor for, so it can only appear as a literal; POS for べき is therefore lost.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "The copula だ is expressible via Copula<\"Plain\"> (= だ) but is hardcoded into the べきだ literal instead, an avoidable raw literal for a modellable inflection.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "べきだ collapses two morphemes (べき + だ) into one literal chunk; at minimum だ could be split out via Copula, leaving べき as the only honest literal.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The attributive particle の is glued as a raw literal in `${本当}の${こと}` instead of being exposed as a separate particle; particle integrity is broken.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "べきだ is a single raw literal. The copula だ should be Copula<\"Plain\"> (the library provides it); べき is an unmodeled bound auxiliary that should be isolated, not fused with だ.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Sentence-final だ uses a raw literal instead of the available Copula/ConjugateCopula constructor.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "べきだ collapses two morphemes (auxiliary べき + copula だ) into one chunk, hiding internal structure.",
+      "itemId": "r6-c0",
+      "jp": "本当のことを言うべきだ",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "寒い is declared as `IAdjective & { stem: \"寒\"; ending: \"い\" }` instead of the canonical `{ type: \"i-adjective\"; stem: \"寒\"; ending: \"い\" }`. It still type-checks and classifies as an i-adjective via the intersection, but the non-standard authoring style is slightly less clear than other chapters.",
+      "itemId": "r6-c1",
+      "jp": "昨日は寒かった",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "かけられた is a raw string hiding verb かける + passive られ + past た; should decompose using ConjugateVerb<かける,'Passive'>='かけられ' then append た, since かける is fully modellable.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The sentence's main verb かける is never declared as an IchidanVerb; its POS is entirely lost inside the literal.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "知らぬ uses ConjugateVerb<知る,'Nai'> for 知ら then appends literal ぬ; the library has no classical negative-attributive ぬ form, so the literal is a defensible workaround.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "No combined Passive+Past form exists, so た must be a literal even if かけられ were conjugated; minor library gap.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "かけられた hides the main verb かける (ichidan) plus passive られ plus past た in one literal; should be built from a verb constructor + ConjugateVerb Passive form.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Passive form is modellable: type かける = IchidanVerb & {stem:'かけ';ending:'る'}; ConjugateVerb<かける,'Passive'> yields かけられ, then a た literal — far more honest than the raw literal かけられた.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ぬ (classical negative attributive) has no library form, so Nai-stem 知ら + literal ぬ is an acceptable approximation, but the 'Nai' form name slightly misrepresents the ぬ auxiliary.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The main verb かける is absent as a constructor; the predicate of the sentence carries no POS.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "かけられた is the sentence's main predicate (ichidan かける + Passive られ + past た). The library can produce ConjugateVerb<かける,'Passive'> = かけられ; appending た would be honest. Leaving it a raw literal with no かける verb declared hides the core grammar.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The predicate verb かける is not modeled in any constructor (no GodanVerb/IchidanVerb declaration), so the only verb actually typed is the relative-clause 知る.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "かけられた is a single leaf hiding verb stem + passive auxiliary + past auxiliary.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "ぬ (classical negative auxiliary) has no dedicated form; using Nai (未然形) + literal ぬ is a defensible workaround given the library lacks a 文語 negative form.",
+      "itemId": "r6-c2",
+      "jp": "知らぬ人に声をかけられた",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "なくてもいいです is a single raw literal hiding negative auxiliary なく, conjunctive て, particle も, i-adjective いい, and copula です. Only 来 comes from a constructor.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The particle も is buried inside the literal string and never appears as its own unit.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Permission construction frozen wholesale; いい/です are modellable via ConjugateAdjective<いい,\"Polite\"> and the negative via the conjugator, so the literal needlessly discards structure.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "です polite copula should derive from the conjugator (library supports ConjugateAdjective Polite = いいです) rather than being a raw literal.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "い-adjective いい and copula です are absent from any POS constructor, hidden in the literal tail.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "なくてもいいです is one collapsed literal; at minimum です (Copula<'Polite'>) and いい (ConjugateAdjective<いい,'Basic'>) should be separate composed units, exposing the negative adverbial なく + て + も structure.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particle も (and te-linker て) hidden inside the literal string instead of being visible morphemes.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "Polite です written as a raw literal though the library provides Copula<'Polite'>=です.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "い-adjective いい hidden in the literal rather than modeled as an IAdjective.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The negative auxiliary ない's adverbial なく has no dedicated constructor, so the なくて span is hard to express fully even with best effort; only the literal-everything choice is the authoring slip.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "なくてもいいです collapses ない/なくて/も/いい/です into a single literal; at minimum いいです should be ConjugateAdjective<いい,'Polite'> and the も particle made visible.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Concessive particle も is hidden inside the literal; it should be its own visible unit.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The negative auxiliary ない and its te-form なくて cannot be generated by the conjugator (verb 'Nai' returns only the 未然形 stem 来/こ), so the author bolts なくて onto the stem as a literal, splitting one negative morpheme across a tag and a string — misleading. Library lacks auxiliary-adjective (ない) conjugation and a なくてもいい permission construction.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "content",
+      "note": "いいです is expressible via the i-adjective Polite form (special いい handling exists) but was frozen as a raw literal.",
+      "itemId": "r6-c3",
+      "jp": "今日は来なくてもいいです",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "わけにはいきません dumped as one raw literal; should be CommonNoun<\"わけ\"> + particle に + particle は + ConjugateVerb<行く,\"Masen\">.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles に and は are hidden inside the literal には instead of being visible PhraseWithParticle units.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "いきません is 行く + Masen; library supports Masen form (line 32) so it should not be a literal.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Verb 行く and formal noun わけ receive no constructor / POS classification at all.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "わけにはいきません is one frozen literal; should decompose into わけ (formal/CommonNoun), particle に, particle は, and 行く conjugated.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles に and は are buried inside the literal instead of being their own units (e.g. via PhraseWithParticle).",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "いきません should be ConjugateVerb<行く,\"Masen\"> (行く is a GodanVerb the library can conjugate to ません); using a raw literal misses the modellable negative-polite form.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "行く and わけ get no constructor at all because the tail is a literal; the verb's godan class and the formal noun are lost.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D2",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "わけにはいきません is dumped as one raw literal, hiding the formal noun わけ, particles に/は, and the verb いく. Should decompose to CommonNoun<\"わけ\"> + に + は + ConjugateVerb<いく,\"Masen\">.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D3",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Particles に and は are buried inside the literal わけにはいきません instead of being their own visible units.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "いきません (行きません) is a polite negative of godan いく that the library can produce via ConjugateVerb<いく,\"Masen\"> (Masen form exists), but it is frozen as a literal.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "わけ (形式名詞) and いく are content words with no constructor; they live only in the raw literal.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The whole わけにはいかない idiomatic predicate plus a modellable conjugation is hidden in one literal, contrary to how the sentence would be taught.",
+      "itemId": "r6-c4",
+      "jp": "今日は休むわけにはいきません",
+      "source": "chapter"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "おっしゃる modeled as IchidanVerb; it is a godan honorific verb. The author froze the irregular ます-stem おっしゃい into stem and used ending る so MasuPast (stem+ました) coincidentally surfaces correctly. Wrong verb class — the rubric's named example.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "The ichidan misclassification is internally inconsistent: ConjugateVerb<this,\"Dictionary\"> would give おっしゃいる, a non-word. Misleading grammatical analysis.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "The library's IrregularConjugationMap only covers する/来る/くる, so honorific godan verbs with irregular ます-stems (おっしゃる, いらっしゃる, なさる) cannot be faithfully conjugated. The honest path the library uses elsewhere (a01.ts, i04.ts) is a raw template literal おっしゃいました; the ts-def gap is what pushed the author to fake an ichidan verb.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "先生 wrapped in POS-agnostic NounPart, hiding that it is a common noun (普通名詞) rather than using a common-noun-specific part.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "おっしゃる declared as IchidanVerb; it is an honorific godan (う-verb). The ichidan model with stem 'おっしゃい' is chosen purely to make MasuPast resolve to おっしゃいました, misrepresenting the part of speech / verb class. The codebase's own a01.ts comment confirms it is godan.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "high",
+      "rootCause": "content",
+      "note": "Segmentation does not match how the verb is analyzed grammatically. Honest options: model as GodanVerb and accept the library cannot derive the irregular おっしゃい ます形 (spell おっしゃいました as a documented literal, as the reference does), rather than forcing an ichidan reclassification.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "The library's GodanVerb conjugation produces the regular おっしゃり for MasuStem and has no way to express the irregular おっしゃい ます形 of honorific godan verbs (おっしゃる/なさる/いらっしゃる/くださる), which is the root pressure that led the author to misclass the verb.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D1",
+      "severity": "high",
+      "rootCause": "ts-def",
+      "note": "おっしゃる is a special honorific godan (-aru) verb whose 連用形 is irregular (おっしゃい, not おっしゃり). It is misfiled as IchidanVerb with stem 'おっしゃい'/ending 'る'. The library has no honorific/irregular-aru verb class, so the author abused IchidanVerb to force the surface. A proper GodanVerb { stem:'おっしゃ'; ending:'る' } would wrongly yield おっしゃります, hence the workaround.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D4",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "MasuPast surface おっしゃいました is correct, but only because the ichidan stem was hand-set to おっしゃい; the conjugator is not genuinely modeling the irregular 連用形. The same fake-ichidan model implies a bogus dictionary form おっしゃいる.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    },
+    {
+      "dimension": "D6",
+      "severity": "low",
+      "rootCause": "ts-def",
+      "note": "Inflection is technically via ConjugateVerb but rests on a wrong verb class; honest modeling of this honorific verb is impossible with the current types.",
+      "itemId": "r6-a2",
+      "jp": "先生がおっしゃいました。",
+      "source": "annotate"
+    }
+  ]
+}
