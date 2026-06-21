@@ -41,6 +41,35 @@ const ROUNDS: RoundResult[] = Object.values(modules).sort(
   (a, b) => a.round - b.round
 );
 
+// --- Hard eval: real codex annotate pipeline on the hard-cases set ---
+interface HardItem {
+  id: string;
+  jp: string;
+  en: string;
+  category: string;
+  modelability: "full" | "partial" | "classical-literal";
+  difficulty: "hard" | "very-hard";
+  passed: boolean;
+  attempts: number;
+  resolved: string | null;
+  error: string | null;
+}
+interface HardRound {
+  round: number;
+  ran: number;
+  passed: number;
+  passRate: number;
+  byCategory: Record<string, { ran: number; passed: number }>;
+  items: HardItem[];
+}
+const hardModules = import.meta.glob<HardRound>("../../eval/history/hard-*.json", {
+  eager: true,
+  import: "default",
+});
+const HARD_ROUNDS: HardRound[] = Object.values(hardModules).sort(
+  (a, b) => a.round - b.round
+);
+
 // The six rubric dimensions, in order, with short bilingual labels.
 const DIMS: { key: string; en: string; zh: string }[] = [
   { key: "D1", en: "POS", zh: "词类" },
@@ -71,6 +100,115 @@ function ConformanceBar({ value }: { value: number }) {
   );
 }
 
+const CAT_LABEL: Record<string, { en: string; zh: string }> = {
+  "relative-clause": { en: "Relative clause", zh: "连体修饰节" },
+  "causative-passive-keigo": { en: "Causative-passive", zh: "使役被动" },
+  "keigo-chains": { en: "Keigo chains", zh: "敬语叠加" },
+  "nominalization-embedding": { en: "Nominalization", zh: "名词化嵌套" },
+  "aux-verb-chains": { en: "Aux-verb chains", zh: "补助动词链" },
+  "conditional-concessive": { en: "Conditional", zh: "条件让步" },
+  "quotation-modality": { en: "Quotation", zh: "引用情态" },
+  "long-multiclause": { en: "Multi-clause", zh: "多句复合" },
+  "classical-formal": { en: "Classical", zh: "文语古典" },
+};
+
+function HardEvalSection() {
+  const { t } = useLang();
+  const [open, setOpen] = useState<number>(
+    HARD_ROUNDS.length ? HARD_ROUNDS[HARD_ROUNDS.length - 1]!.round : 0
+  );
+  if (!HARD_ROUNDS.length) return null;
+  const latest = HARD_ROUNDS[HARD_ROUNDS.length - 1]!;
+
+  return (
+    <div className="mb-9">
+      <h3 className="m-0 font-heading text-[1.2rem] font-extrabold text-ink-900">
+        {t("Hard eval — real codex pipeline", "高难度评测 —— 真实 codex 流水线")}
+      </h3>
+      <p className="mt-2 mb-4 text-[0.92rem] text-ink-500 leading-relaxed max-w-[68ch]">
+        {t(
+          "A much harder set: every sentence is run through the real `codex exec` annotate pipeline, and a case passes only if codex produces a snippet that type-checks AND resolves byte-identically to the target. Pass-rate is the honest end-to-end accuracy; classical-literal cases are reported separately since the library cannot fully express them.",
+          "一组难度高得多的句子：每句都经过真实的 `codex exec` 标注流水线，只有当 codex 生成的代码既能通过类型检查、又能逐字还原出原句时才算通过。通过率即端到端的真实准确度；文语古典句因类型库无法完全表达，单独统计。"
+        )}
+      </p>
+
+      {/* trend */}
+      <div className="rounded-2xl border border-border bg-surface overflow-hidden mb-5">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-[0.86rem]">
+            <thead>
+              <tr className="text-ink-400 text-left">
+                <th className="font-semibold px-5 py-2.5">{t("Round", "轮次")}</th>
+                <th className="font-semibold px-3 py-2.5 min-w-[160px]">{t("Pass rate", "通过率")}</th>
+                <th className="font-semibold px-3 py-2.5 text-right whitespace-nowrap">{t("Passed", "通过")}</th>
+                <th className="font-semibold px-3 py-2.5 text-right whitespace-nowrap">{t("Modelable", "可建模")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {HARD_ROUNDS.map((r) => {
+                const mod = r.items.filter((x) => x.modelability !== "classical-literal");
+                const modPass = mod.filter((x) => x.passed).length;
+                return (
+                  <tr
+                    key={r.round}
+                    className={`border-t border-border cursor-pointer ${r.round === open ? "bg-surface-2" : ""}`}
+                    onClick={() => setOpen(r.round)}
+                  >
+                    <td className="px-5 py-2.5 font-semibold text-ink-700 tabular-nums">{String(r.round).padStart(3, "0")}</td>
+                    <td className="px-3 py-2.5"><ConformanceBar value={r.passRate} /></td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-500">{r.passed}/{r.ran}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-500">{pct(mod.length ? modPass / mod.length : undefined)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* latest round per-case */}
+      <div className="rounded-2xl border border-border bg-surface overflow-hidden">
+        <div className="px-5 py-3 border-b border-border text-[0.82rem] text-ink-400">
+          {t(`Round ${String(latest.round).padStart(3, "0")} — every hard case`, `第 ${String(latest.round).padStart(3, "0")} 轮 —— 全部难句`)}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-[0.86rem]">
+            <thead>
+              <tr className="text-ink-400 text-left">
+                <th className="font-semibold px-5 py-2">{t("Sentence", "句子")}</th>
+                <th className="font-semibold px-3 py-2 whitespace-nowrap">{t("Category", "类别")}</th>
+                <th className="font-semibold px-3 py-2 text-right whitespace-nowrap">{t("Result", "结果")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {latest.items.map((it) => (
+                <tr key={it.id} className="border-t border-border align-top">
+                  <td className="px-5 py-2 font-jp text-ink-900 max-w-[460px]">{it.jp}</td>
+                  <td className="px-3 py-2 text-ink-400 whitespace-nowrap">
+                    {t(CAT_LABEL[it.category]?.en ?? it.category, CAT_LABEL[it.category]?.zh ?? it.category)}
+                    {it.difficulty === "very-hard" && <span className="ml-1 text-[0.7rem] text-sakura-600">★</span>}
+                  </td>
+                  <td className="px-3 py-2 text-right whitespace-nowrap">
+                    {it.passed ? (
+                      <span className="text-[0.78rem] font-semibold text-emerald-600">
+                        {t(`pass · ${it.attempts}× `, `通过 · ${it.attempts}次`)}
+                      </span>
+                    ) : it.modelability === "classical-literal" ? (
+                      <span className="text-[0.78rem] font-semibold text-ink-400">{t("classical", "文语")}</span>
+                    ) : (
+                      <span className="text-[0.78rem] font-semibold text-amber-600">{t("miss", "未通过")}</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Eval() {
   const { lang, t } = useLang();
   const first = ROUNDS.length ? ROUNDS[0] : undefined;
@@ -97,8 +235,8 @@ export default function Eval() {
         </h2>
         <p className="mt-2 mb-0 text-[0.92rem] text-ink-500 leading-relaxed max-w-[68ch]">
           {t(
-            "A fixed benchmark of grammar examples, scored each round by independent reviewers against a rubric across six dimensions. Conformance is the mean item score (out of 12). The same items are scored every round, so the trend is comparable. Results are shown as recorded.",
-            "一组固定的语法示例基准，每轮由独立评审依据评分标准、从六个维度打分。Conformance 为各条目得分的均值（满分 12）。每轮评测的都是同一批条目，因此趋势可比。此处如实展示记录结果。"
+            "Two complementary measures: a hard end-to-end eval that runs the real codex annotate pipeline on difficult sentences, and a fixed rubric benchmark scored by independent reviewers. Both are shown as recorded.",
+            "两套互补的指标：高难度端到端评测（用真实 codex 标注流水线处理难句），以及由独立评审按评分标准打分的固定基准。均如实展示记录结果。"
           )}
         </p>
         <a
@@ -110,6 +248,18 @@ export default function Eval() {
           {t("Rubric & methodology", "评分标准与方法")} →
         </a>
       </div>
+
+      <HardEvalSection />
+
+      <h3 className="m-0 mb-1 font-heading text-[1.2rem] font-extrabold text-ink-900">
+        {t("Fixed benchmark — rubric scoring", "固定基准 —— 评分标准打分")}
+      </h3>
+      <p className="mt-1 mb-4 text-[0.9rem] text-ink-500 leading-relaxed max-w-[68ch]">
+        {t(
+          "The same grammar examples scored every round across six rubric dimensions (0–12). A comparable trend; conformance is the mean item score.",
+          "每轮对同一批语法示例、按六个评分维度打分（0–12）。趋势可比，Conformance 为各条目得分均值。"
+        )}
+      </p>
 
       {/* Trend overview */}
       <div className="rounded-2xl border border-border bg-surface overflow-hidden mb-7">
