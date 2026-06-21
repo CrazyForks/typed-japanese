@@ -18,6 +18,7 @@ const entries: VocabEntry[] = [
   { word: "わけ", reading: "わけ", romaji: "wake", pos: "noun", en: "reason; (in 〜わけにはいかない) way/grounds", zh: "道理；缘由" },
   { word: "いく", reading: "いく", romaji: "iku", pos: "verb-godan", en: "to go", zh: "去" },
   { word: "早い", reading: "はやい", romaji: "hayai", pos: "i-adjective", en: "early; fast", zh: "早；快" },
+  { word: "もらう", reading: "もらう", romaji: "morau", pos: "verb-godan", en: "to receive, to get", zh: "得到；收到" },
 ];
 
 export default entries;

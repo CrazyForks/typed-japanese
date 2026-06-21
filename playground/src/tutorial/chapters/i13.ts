@@ -105,14 +105,15 @@ type 先生が私に辞書をくれました = \`\${PhraseWithParticle<先生, "
           reading: "わたしはともだちにほんをもらう",
           en: "I receive a book from my friend.",
           zh: "我从朋友那里得到一本书。",
-          code: `import type { CommonNoun, Pronoun, PhraseWithParticle } from "typed-japanese";
+          code: `import type { CommonNoun, Pronoun, PhraseWithParticle, GodanVerb, ConjugateVerb } from "typed-japanese";
 
 type 私 = Pronoun<"私">;
 type 友達 = CommonNoun<"友達">;
 type 本 = CommonNoun<"本">;
+type もらう = GodanVerb & { stem: "もら"; ending: "う" };
 
-// 私 は + 友達 に (source) + 本 を + もらう
-type 私は友達に本をもらう = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<友達, "に">}\${PhraseWithParticle<本, "を">}もらう\`;
+// 私 は + 友達 に (source) + 本 を + もらう (辞書形)
+type 私は友達に本をもらう = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<友達, "に">}\${PhraseWithParticle<本, "を">}\${ConjugateVerb<もらう, "Dictionary">}\`;
 `,
         },
         {
@@ -120,14 +121,15 @@ type 私は友達に本をもらう = \`\${PhraseWithParticle<私, "は">}\${Phr
           reading: "わたしはははにおかねをもらいました",
           en: "I received money from my mother.",
           zh: "我从母亲那里收到了钱。",
-          code: `import type { CommonNoun, Pronoun, PhraseWithParticle } from "typed-japanese";
+          code: `import type { CommonNoun, Pronoun, PhraseWithParticle, GodanVerb, ConjugateVerb } from "typed-japanese";
 
 type 私 = Pronoun<"私">;
 type 母 = CommonNoun<"母">;
 type お金 = CommonNoun<"お金">;
+type もらう = GodanVerb & { stem: "もら"; ending: "う" };
 
-// 私 は + 母 に + お金 を + もらいました (polite past)
-type 私は母にお金をもらいました = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<母, "に">}\${PhraseWithParticle<お金, "を">}もらいました\`;
+// 私 は + 母 に + お金 を + もらいました (もらう の丁寧過去)
+type 私は母にお金をもらいました = \`\${PhraseWithParticle<私, "は">}\${PhraseWithParticle<母, "に">}\${PhraseWithParticle<お金, "を">}\${ConjugateVerb<もらう, "MasuPast">}\`;
 `,
         },
       ],
