@@ -222,27 +222,50 @@ function tokenizeLiteral(text: string): Tok[] {
       i = j;
       continue;
     }
-    // Kana / other: longest vocabulary match (particles, suffixes, kana words).
+    // Kana run: take it atomically and try to tokenize the WHOLE run into known
+    // vocabulary (longest-match). Only emit the split if it consumes the entire
+    // run with no leftover — otherwise keep the run as one literal. This stops a
+    // greedy particle match from shredding an unmodeled word (もらう → も + らう);
+    // a verb left as a raw literal stays whole rather than splitting wrongly.
+    let j = i;
+    while (j < text.length && !KANJI.test(text[j]!)) j++;
+    const run = text.slice(i, j);
+    const toks = tokenizeKanaRun(run);
+    if (toks) {
+      flush();
+      for (const tk of toks) out.push(tk);
+    } else {
+      plain += run;
+    }
+    i = j;
+  }
+  flush();
+  return out;
+}
+
+/**
+ * Greedily longest-match a contiguous kana run against the vocabulary. Returns
+ * the token list only if the run is FULLY covered by known surfaces; returns
+ * null (caller keeps the run as a single literal) the moment any character can't
+ * be matched, so unknown words are never partially shredded.
+ */
+function tokenizeKanaRun(run: string): Tok[] | null {
+  const toks: Tok[] = [];
+  for (let i = 0; i < run.length; ) {
     let matched: string | null = null;
-    const maxL = Math.min(SURFACE_MAXLEN, text.length - i);
+    const maxL = Math.min(SURFACE_MAXLEN, run.length - i);
     for (let len = maxL; len >= 1; len--) {
-      const sub = text.slice(i, i + len);
-      if (SURFACES.has(sub) && !KANJI.test(sub[0]!)) {
+      const sub = run.slice(i, i + len);
+      if (SURFACES.has(sub)) {
         matched = sub;
         break;
       }
     }
-    if (matched) {
-      flush();
-      out.push({ surface: matched, category: categorizeSurface(matched) });
-      i += matched.length;
-    } else {
-      plain += text[i];
-      i += 1;
-    }
+    if (!matched) return null; // unknown remainder → keep the whole run as one literal
+    toks.push({ surface: matched, category: categorizeSurface(matched) });
+    i += matched.length;
   }
-  flush();
-  return out;
+  return toks;
 }
 
 function literalNodes(
