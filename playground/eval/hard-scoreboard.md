@@ -10,8 +10,9 @@ library cannot fully express.
 |---|---|---|---|---|---|---|
 | 001 | 2026-06-21 06:15 | 25 | 21 | **84.0%** | 86.4% | 90.9% / 78.6% |
 | 002 | 2026-06-21 07:19 | 25 | 21 | **84.0%** | 86.4% | 81.8% / 85.7% |
+| 003 | 2026-06-21 08:10 | 25 | 21 | **84.0%** | 90.9% | 81.8% / 85.7% |
 
-## Round 002 by category
+## Round 003 by category
 
 | category | pass |
 |---|---|
@@ -19,8 +20,8 @@ library cannot fully express.
 | causative-passive-keigo | 3/3 |
 | keigo-chains | 2/3 |
 | nominalization-embedding | 2/2 |
-| aux-verb-chains | 2/3 |
+| aux-verb-chains | 3/3 |
 | conditional-concessive | 2/3 |
 | quotation-modality | 3/3 |
 | long-multiclause | 3/3 |
-| classical-formal | 2/3 |
+| classical-formal | 1/3 |

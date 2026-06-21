@@ -36,7 +36,8 @@ export type ConjugationForm =
   | "Nai" // Negative form
   | "Nakute" // Negative te-form (行かなくて, 食べなくて) — for 〜なくて(も)/〜なくては
 
-  | "Potential" // Potential form
+  | "Potential" // Potential form (bare stem: 行け, いただけ, 食べられ)
+  | "PotentialMasu" // Polite potential — full ます surface (行けます, いただけます)
   | "Passive" // Passive form
   | "Causative" // Causative form
   | "Volitional" // Volitional form
@@ -260,12 +261,22 @@ export type ConjugateVerb<
   ? `${GetMasuStem<V>}ません`
   : F extends "MasenDeshita"
   ? `${GetMasuStem<V>}ませんでした`
+  : F extends "PotentialMasu"
+  ? `${ConjugateVerb<V, "Potential">}ます`
   : F extends "Nakute"
   ? `${ConjugateVerb<V, "Nai">}なくて`
   : V extends GodanVerb
   ? F extends "Dictionary"
     ? `${V["stem"]}${V["ending"]}`
-    : `${V["stem"]}${GetGodanConjugation<V["ending"], F>}`
+    : // 行く/いく are irregular in ONLY their て/た forms (行って/行った, not the
+      // regular く→いて the map would give); every other form stays regular.
+      V extends { stem: "行" | "い"; ending: "く" }
+      ? F extends "Te"
+        ? `${V["stem"]}って`
+        : F extends "Ta"
+        ? `${V["stem"]}った`
+        : `${V["stem"]}${GetGodanConjugation<V["ending"], F>}`
+      : `${V["stem"]}${GetGodanConjugation<V["ending"], F>}`
   : V extends IchidanVerb
   ? F extends "Dictionary"
     ? `${V["stem"]}${V["ending"]}`
