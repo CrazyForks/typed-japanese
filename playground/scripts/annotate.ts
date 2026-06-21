@@ -51,10 +51,11 @@ interface Args {
   model?: string;
   dryRun: boolean;
   help: boolean;
+  printPrompt: boolean;
 }
 
 function parseArgs(argv: string[]): Args {
-  const out: Args = { sentence: "", retries: 3, engine: "codex", dryRun: false, help: false };
+  const out: Args = { sentence: "", retries: 3, engine: "codex", dryRun: false, help: false, printPrompt: false };
   const positional: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]!;
@@ -71,6 +72,7 @@ function parseArgs(argv: string[]): Args {
       }
       case "--model": out.model = argv[++i]; break;
       case "--dry-run": out.dryRun = true; break;
+      case "--print-prompt": out.printPrompt = true; break;
       case "-h":
       case "--help": out.help = true; break;
       default:
@@ -196,7 +198,7 @@ ${API_REFERENCE}
 - A clause-connecting 接続助詞 after a Te-form (から in 洗ってから, けど, ので) MUST be its own ParticlePart — never glued into a literal after ConjugateVerb<V,"Te">.
 - Negative te-forms come from the conjugator: 〜なくて(も) is ConjugateVerb<V,"Nakute"> (来なくて), then も as its own particle — never a frozen なくても literal.
 - Stack particles individually: には/では/ても = nested PhraseWithParticle (e.g. PhraseWithParticle<PhraseWithParticle<X,"に">,"は">) or sequential ParticlePart; never write a bare particle literal between typed units.
-- Classical auxiliaries (べき, ぬ, ざる) may stay as literals, but a FOLLOWING modern copula だ/です MUST be Copula<"Plain">/ConjugateCopula — write べき${Copula<"Plain">}, never the literal べきだ.
+- Classical auxiliaries (べき, ぬ, ざる) may stay as literals, but a FOLLOWING modern copula だ/です MUST be Copula<"Plain">/ConjugateCopula — write べき\${Copula<"Plain">}, never the literal べきだ.
 - An adjective in its 連用形 (i-adjective く: 早く, 高く, よく; na-adjective に: 本当に, 上手に, 静かに) is NOT a lexical 副詞 — model it as AdjectivePart<A, "Adverbial"> (or ConjugateAdjective<A, "Adverbial">), NEVER Adverb/AdverbPart. Reserve Adverb for words with no adjective base (毎日, すぐ, また, とても).
 - Choose a verb's class by its REAL conjugation type (godan/ichidan/irregular), NEVER by which class happens to make the target surface resolve. Reclassifying a godan verb as IchidanVerb (or vice versa) to force a form is a hard error even if it type-checks — sanity-check that the implied Dictionary form is a real word. If the library cannot produce a verb's correct surface (e.g. honorific -aru verbs おっしゃる/いらっしゃる/なさる, whose 連用形 is the irregular おっしゃい/いらっしゃい/なさい), declare the verb in its TRUE class and write the unmodelable inflected surface as a documented raw literal — do not fake the class.
 - A SuffixPart string must NEVER contain a conjugatable verb stem. Negation ない / polite negative come from the conjugator: 得ない = VerbPart<得る,"Nai">, 行かない = VerbPart<行く,"Nai">, NOT VerbPart<…,"MasuStem"> + SuffixPart<"ない"> and NOT SuffixPart<"行かざる">. Expose the lexical verb as a VerbPart; only a genuinely unmodeled bound auxiliary (e.g. classical ざる) may be a trailing SuffixPart after that VerbPart.
@@ -691,6 +693,14 @@ function main(): void {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     console.log(USAGE);
+    process.exit(0);
+  }
+  // Smoke-check the prompt template literals without calling any model — the gate
+  // runs this so a `${…}` bug in the prompt (which would crash every real run)
+  // can't slip through `--help`.
+  if (args.printPrompt) {
+    const p = buildPrompt(args.sentence || "テスト");
+    console.log(`prompt OK (${p.length} chars)`);
     process.exit(0);
   }
   if (!args.sentence) {

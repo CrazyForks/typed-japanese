@@ -21,9 +21,11 @@ const typecheck = run("npx tsc --noEmit");
 // break example assertions the playground tsconfig doesn't see (caught the Masu
 // migration leaving example-verb.ts stale).
 const lib = run("npx tsc --noEmit -p ../tsconfig.json");
-// annotate.ts is a bun script outside the tsc project; parse/smoke-check it so an
-// edit to its prompt (a giant template literal) can't silently break generation.
-const annotate = run("bun scripts/annotate.ts --help");
+// annotate.ts is a bun script outside the tsc project. --print-prompt builds the
+// full prompt (exercising every template literal in API_REFERENCE / hard-rules /
+// few-shots) without calling a model, so a `${…}` interpolation bug — which would
+// crash every real codex run — fails the gate instead of slipping through --help.
+const annotate = run('bun scripts/annotate.ts "テスト" --print-prompt');
 const ok = snippets && vocab && typecheck && lib && annotate;
 
 process.stdout.write(JSON.stringify({ snippets, vocab, typecheck, lib, annotate, ok }));
